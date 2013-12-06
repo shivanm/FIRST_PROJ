@@ -1,0 +1,2 @@
+class LongNote < Question
+end

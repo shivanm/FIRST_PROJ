@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TestIT - A platform for FYJC students of Mumbai University to give online IT Tests</title>
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <script type="text/javascript">
+      $(function () {
+          $('#instruction_container').animate({"top": "+=2020px"}, "slow");
+          $("#start_test_btn").on('click', function () {
+              $('#instruction_panel').fadeOut('slow', function () {
+                  $('#test_panel').fadeIn('slow');
+              });
+          });
+          for (i = 1; i < 9; i++) {
+              $('#q' + i).on('click', function () {
+                  var div_id = $(this).attr('id')
+                  $('.active').fadeOut(400,function () {
+                      $('#' + div_id + '_div').fadeIn(400).addClass('active');
+                  }).removeClass('active');
+
+              });
+          }
+      });
+  </script>
+  <link href="css/main.css" rel="stylesheet">
+  <link href="css/test.css" rel="stylesheet">
+</head>
+<body>
+<div id='instruction_panel'>
+  <div id='instruction_container'>
+    <h2>Instructions</h2>
+    <hr>
+    <div id="instruction_content">
+      erbqerberb<br>
+      erbqerberb<br>
+      \nerbqerberb<br>
+      erbqerberb<br>
+      erbqerberb<br>
+      erbqerberb<br>
+      \nerbqerberb<br>
+      erbqerberb<br>
+      erbqerberb<br>
+      erbqerberb<br>
+      \nerbqerberb<br>
+      erbqerberb<br>
+      erbqerberb<br>
+      erbqerberb<br>
+      \nerbqerberb<br>
+      erbqerberb<br>
+      erbqerberb<br>
+      erbqerberb<br>
+      \nerbqerberb<br>
+      erbqerberb<br>
+      erbqerberb<br>
+      erbqerberb<br>
+      \nerbqerberb<br>
+      erbqerberb<br>
+    </div>
+    <div id="start_test_btn" class="red_button">Start Test</div>
+  </div>
+</div>
+<div id="test_panel">
+<div id='top_bar'>
+  <div id='logo'>
+    TestIT
+  </div>
+  <div id='counter'>
+    Counter
+  </div>
+  <div class="name_div"><h3>Hi, Nikunj Thakkar </h3></div>
+
+</div>
+<div id='left_panel'>
+  <a href='#' id='q1' class="question_list">Question 1</a>
+  <a href='#' id='q2' class="question_list">Question 2</a>
+  <a href='#' id='q3' class="question_list">Question 3</a>
+  <a href='#' id='q4' class="question_list">Question 4</a>
+  <a href='#' id='q5' class="question_list">Question 5</a>
+  <a href='#' id='q6' class="question_list">Question 6</a>
+  <a href='#' id='q7' class="question_list">Question 7</a>
+  <a href='#' id='q8' class="question_list">Question 8</a>
+
+  <div class="submit_btn red_button">Submit Text</div>
+</div>
+<div id='main_content'>
+
+<div id='q1_div' style="display: block" class='content active'>
+  <h3>Question 1 >> Fill in the blank<span class="weightage">(1 X 10)</span></h3>
+  <hr>
+  <br>
+  <ol id='fill'>
+    <% @fill_in_the_blank.each_with_index do |fill, index| %>
+        <li>
+          <div class="srno_field"><%= (index+1) %></div>
+          <div class="que_field"><%= fill.cipher %></div>
+          <div class="ans_field"><input type="text" size="15" id="<%= fill.id %>"></div>
+        </li>
+    <% end %>
+    <% @fill_in_the_blank_next.each_with_index do |fill, index| %>
+        <li>
+          <div class="srno_field"><%= (index+7) %></div>
+          <div class="que_field"><%= fill.cipher %></div>
+          <div class="ans_field"><input type="text" size="15" id="<%= fill.id %>"></div>
+        </li>
+    <% end %>
+  </ol>
+</div>
+<div id='q2_div' class='content'>
+  <h3>Question 2 >> State whether True or False<span class="weightage">(1 X 10)</span></h3>
+  <hr>
+  <br>
+  <ol id='TF'>
+    <% @true_false.each_with_index do |tf, index| %>
+        <li>
+          <div class="srno_field"><%= (index+1) %></div>
+          <div class="que_field"><%= tf.cipher %></div>
+          <div class="ans_field"><input type="radio" name="<%= tf.id %>" value="True">True &nbsp;&nbsp;
+            <input type="radio" name="<%= tf.id %>">False
+          </div>
+        </li>
+    <% end %>
+    <% @true_false_next.each_with_index do |tf, index| %>
+        <li>
+          <div class="srno_field"><%= (index+7) %></div>
+          <div class="que_field"><%= tf.cipher %></div>
+          <div class="ans_field"><input type="radio" name="<%= tf.id %>" value="True">True &nbsp;&nbsp;
+            <input type="radio" name="<%= tf.id %>">False
+          </div>
+        </li>
+    <% end %>
+
+  </ol>
+
+</div>
+<div id='q3_div' class='content '>
+  <h3>Question 3 >> Multiple Choice with one correct<span class="weightage">(1 X 20)</span></h3>
+  <hr>
+  <br>
+  <ol class="mcq">
+    <% @mcq1.each_with_index do |qn, index| %>
+        <li>
+          <div class="srno_field"><%= index + 1 %></div>
+          <div class="que_field_mcq"><%= qn.cipher %></div>
+          <br>
+          <br>
+
+          <div class="ans_field_mcq">
+            <ul>
+              <% qn.options.each do |option| %>
+                  <li><input type="radio" name="<%= qn.id %>" id="<%= option.id %>"><%= option.key %></li>
+              <% end %>
+            </ul>
+          </div>
+        </li>
+    <% end %>
+    <% @mcq1_next.each_with_index do |qn, index| %>
+        <li>
+          <div class="srno_field"><%= index + 19 %></div>
+          <div class="que_field_mcq"><%= qn.cipher %></div>
+          <br>
+          <br>
+
+          <div class="ans_field_mcq">
+            <ul>
+              <% qn.options.each do |option| %>
+                  <li><input type="radio" name="<%= qn.id %>" id="<%= option.id %>"><%= option.key %></li>
+              <% end %>
+            </ul>
+          </div>
+        </li>
+    <% end %>
+  </ol>
+</div>
+<div id='q4_div' class='content '>
+  <h3>Question 4 >> Multiple Choice with two correct<span class="weightage">(2 X 5)</span></h3>
+  <hr>
+  <br>
+  <ol class="mcq">
+    <% @mcq2.each_with_index do |qn, index| %>
+        <li>
+          <div class="srno_field"><%= index + 1 %></div>
+          <div class="que_field_mcq"><%= qn.cipher %></div>
+          <br>
+          <br>
+
+          <div class="ans_field_mcq">
+            <ul>
+              <% qn.options.each do |option| %>
+                  <li><input type="checkbox" name="<%= qn.id %>" id="<%= option.id %>"><%= option.key %></li>
+              <% end %>
+            </ul>
+          </div>
+        </li>
+    <% end %>
+  </ol>
+</div>
+<div id='q5_div' class='content '>
+  <h3>Question 5 >> Multiple Choice with three correct<span class="weightage">(2 X 3)</span></h3>
+  <hr>
+  <br>
+  <ol class="mcq">
+    <% @mcq3.each_with_index do |qn, index| %>
+        <li>
+          <div class="srno_field"><%= index + 1 %></div>
+          <div class="que_field_mcq"><%= qn.cipher %></div>
+          <br>
+          <br>
+
+          <div class="ans_field_mcq">
+            <ul>
+              <% qn.options.each do |option| %>
+                  <li><input type="checkbox" name="<%= qn.id %>" id="<%= option.id %>"><%= option.key %></li>
+              <% end %>
+            </ul>
+          </div>
+        </li>
+    <% end %>
+  </ol>
+</div>
+<div id='q6_div' class='content '>
+  <h3>Question 6 >> Rearrange in correct sequence<span class="weightage">(2 X 2)</span></h3>
+  <hr>
+  <br>
+  <ol class="mcq">
+    <% @rearrange.each_with_index do |qn, index| %>
+        <li>
+          <div class="srno_field"><%= index + 1 %></div>
+          <div class="que_field_mcq"><%= qn.cipher %></div>
+          <br>
+          <br>
+
+          <div class="ans_field_mcq">
+            <ul>
+              <% qn.options.each do |option| %>
+                  <li><input type="text" name="<%= qn.id %>" id="<%= option.id %>"></li>
+              <% end %>
+            </ul>
+          </div>
+        </li>
+    <% end %>
+  </ol>
+</div>
+<div id='q7_div' class='content '>
+  <h3>Question 7(a) >> Answer in brief<span class="weightage">(4 X 2)</span></h3>
+  <hr>
+  <br>
+  <ol class="mcq">
+    <% @short_note_1.each_with_index do |qn, index| %>
+        <li>
+          <div class="srno_field"><%= index + 1 %></div>
+          <div class="que_field_mcq"><%= qn.cipher %></div>
+          <br>
+          <br>
+
+          <div class="ans_field_mcq">
+            <textarea id="<%= qn.id %>"></textarea>
+          </div>
+        </li>
+    <% end %>
+  </ol>
+  <br>
+
+  <h3>Question 7(b) >> Answer in brief<span class="weightage">(2 X 1)</span></h3>
+  <hr>
+  <br>
+  <ol class="mcq">
+    <% @short_note_2.each_with_index do |qn, index| %>
+        <li>
+          <div class="srno_field"><%= index + 1 %></div>
+          <div class="que_field_mcq"><%= qn.cipher %></div>
+          <br>
+          <br>
+
+          <div class="ans_field_mcq">
+            <textarea id="<%= qn.id %>"></textarea>
+          </div>
+        </li>
+    <% end %>
+  </ol>
+</div>
+<div id='q8_div' class='content '>
+  <h3>Question 8 >> Write the program for given output<span class="weightage">(5 X 2)</span></h3>
+  <hr>
+  <br>
+  <ol class="mcq">
+    <li>
+      <div class="srno_field">1</div>
+      <div class="que_field_html">
+        <img src='img/output.png'></img>
+      </div>
+      <br>
+      <br>
+
+      <div class="ans_field_html ans_field_mcq">
+        <textarea></textarea>
+      </div>
+    </li>
+    <li>
+      <div class="srno_field">1</div>
+      <div class="que_field_html">
+        <img src='img/output.png'></img>
+      </div>
+      <br>
+      <br>
+
+      <div class="ans_field_html ans_field_mcq">
+        <textarea></textarea>
+      </div>
+    </li>
+  </ol>
+</div>
+</div>
+</div>
+</body>
+</html>

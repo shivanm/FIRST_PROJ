@@ -1,0 +1,88 @@
+body {
+    background: #F7F7F7;
+}
+
+#intro_panel {
+    /*border: 1px solid;*/
+    float: left;
+    width: 66%;
+    padding: 2%;
+}
+
+#about_content {
+    width: 100%;
+    /*border: 1px solid;*/
+}
+
+#login_panel {
+    /*border: 1px solid;*/
+    float: left;
+    width: 25%;
+    padding: 2%;
+}
+
+input[type=checkbox], input[type=radio] {
+    height: 18px;
+    width: 18px;
+    z-index: 12;
+    line-height: normal;
+    cursor: pointer;
+}
+
+input:focus, input[type=checkbox]:hover, input[type=radio]:hover {
+    border: 2px solid #F59942;
+}
+
+.fields {
+    width: 100%;
+}
+
+h4.bigger {
+    font-size: 19px;
+}
+
+.lighter {
+    font-weight: 200;
+}
+
+.header {
+    border-bottom: 1px solid #CCCCCC;
+    line-height: 28px;
+    margin-bottom: 16px;
+    margin-top: 18px;
+    padding-bottom: 4px;
+}
+
+.login_lower {
+    width: 100%;
+}
+
+#login_btn {
+    width: 100%;
+    float: left;
+    padding: 5px;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#sign_up_btn {
+    width: 93%;
+    float: left;
+    padding: 5px;
+    margin-top: 10px;
+    font-size: 16px;
+    color: #ffffff;
+}
+#sign_up_btn: visited {
+    color: #ffffff;
+}
+
+#guest_signin_btn {
+    width: 93%;
+    float: left;
+    padding: 5px;
+    margin-top: 10px;
+    font-size: 16px;
+    color: #ffffff;
+}

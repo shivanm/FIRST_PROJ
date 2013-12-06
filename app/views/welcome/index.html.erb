@@ -1,0 +1,29 @@
+<div id='top_bar'>
+    <div id='logo'>
+        TestIT
+    </div>
+    <%= link_to 'Logout', '/users/sign_out', id:"logout_btn", class:"red_button"%>
+    <!--<div id="logout_btn" class="red_button">Logout</div>-->
+    <div id="contact_us_btn" class="light_button">Contact Us</div>
+</div>
+<div id="container">
+    <div id='name_text'>
+        <h2>Hi, <%= @user.name %> ...</h2>
+        <h2>You have <span id='test_left'><%= @test_count %></span> tests left.</h2>
+        <br>
+        <!--<div id="view_report" class="green_button">View Reports</div>-->
+        <%= link_to 'View Reports', test_path, id: "view_report", class:"green_button" %>
+        <br>
+        <br>
+        <br>
+        <br>
+        <%= link_to 'Take Test', test_path, id: "take_test", class:"blue_button" %>
+    </div>
+    <div id='pie_chart'>
+        <h2>Question Paper Distribution</h2>
+        <img src="assets/pie_chart_new.png">
+    </div>
+    <div id='footer_panel'>
+        <div id='copyright'>All Rights Reserved. 2013 <span class="copy_sym">&copy;</span> <a target="_new" href='http://www.yuvabeat.com'><span class="Y YB_logo">Yuva</span><span class="B YB_logo">Beat</span></a></div>
+    </div>
+</div>

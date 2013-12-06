@@ -1,0 +1,152 @@
+body {
+    color: #333333;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+#top_bar {
+    background: none repeat scroll 0 0 #438EB9;
+    border: 1px solid #045E9F;
+    box-shadow: 0 2px 5px #808080;
+    height: 50px;
+    left: 0;
+    padding: 10px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 2;
+}
+
+#logo {
+    border: 1px solid;
+    height: 20px;
+    padding: 14px;
+    vertical-align: middle;
+    width: 11.5%;;
+    float: left;
+}
+
+.blue_button {
+    background-color: #2283C5;
+    text-align: center;
+    color: #ffffff;
+    border: 5px solid #2283C5;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.blue_button:hover {
+    background-color: #045e9f;
+}
+
+.red_button {
+    background-color: #D15B47;
+    text-align: center;
+    color: #ffffff;
+    border: 5px solid #D15B47;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.red_button:hover {
+    background-color: #B74635;
+}
+
+.green_button {
+    background-color: #87B87F;
+    text-align: center;
+    color: #ffffff;
+    border: 5px solid #87B87F;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.green_button:hover {
+    background-color: #629B58;
+}
+
+.orange_button {
+    background-color: #FFB752;
+    text-align: center;
+    color: #ffffff;
+    border: 5px solid #FFB752;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.orange_button:hover {
+    background-color: #E59729;
+}
+
+.light_button {
+    background-color: #6FB3E0;
+    text-align: center;
+    color: #ffffff;
+    border: 5px solid #6FB3E0;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.light_button:hover {
+    background-color: #4f99C6;
+}
+
+input[type='text'], input[type='email'], input[type='password'] {
+    width: 96%;
+    font-size: 14px;
+    height: 32px;
+    line-height: 32px;
+    margin-bottom: 10px;
+    max-height: 32px;
+    padding-left: 10px;
+    box-shadow: 0 0 2px;
+}
+
+#footer_panel{
+    height: 50px;
+    width: 99.9%;
+    top: 100%;
+    background-color: #D9D9D9;
+    border-top: 3px solid #438EB9;
+    margin-top: 6%;
+    float: left;
+    font-size: 16px;
+    color: #333;
+}
+
+#copyright{
+    padding: 10px;
+    float: left;
+}
+
+.Y{
+    color: black;
+
+}
+.B{
+    color: orangered;
+}
+a {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#container {
+    /*border: 1px solid;*/
+    padding: 20px;
+    position: absolute;
+    top: 72px;
+    display: inline-block;
+    width: 95%;
+}
+
+#contact_us_btn {
+    float: right;
+    font-size: 16px;
+    margin-right: 6%;
+    margin-top: 5px;
+    padding: 5px;
+    width: 125px;
+    box-shadow:  0px 0px 2px #000
+}
