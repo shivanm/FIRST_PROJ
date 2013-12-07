@@ -42,7 +42,7 @@ class WelcomeController < ApplicationController
 
       @mcq2 = Question.where(type: 'Mcq2').order('RANDOM()').limit(5)
 
-      @@mcq3 = Question.where(type: 'Mcq3').order('RANDOM()').limit(2)
+      @mcq3 = Question.where(type: 'Mcq3').order('RANDOM()').limit(2)
 
       @rearrange = Question.where(type: 'Rearrange').order('RANDOM()').limit(2)
 
@@ -52,6 +52,10 @@ class WelcomeController < ApplicationController
 
       @html_code = Question.where(type: 'CodingOutput').order('RANDOM()').limit(2)
     end
+
+  end
+
+  def test_submit
 
   end
 

@@ -2,13 +2,19 @@
 <html>
 <head>
   <title>TestIT - A platform for FYJC students of Mumbai University to give online IT Tests</title>
-  <script type="text/javascript" src="js/jquery.js"></script>
+  <!--<script type="text/javascript" src="assets/jquery.js"></script>-->
   <script type="text/javascript">
+      var hours = 2, min = 30, sec = 00;
       $(function () {
+          $('#counter').text(leftPad(hours, 2) + ':' + leftPad(min, 2) + ':' + leftPad(sec, 2));
           $('#instruction_container').animate({"top": "+=2020px"}, "slow");
           $("#start_test_btn").on('click', function () {
               $('#instruction_panel').fadeOut('slow', function () {
-                  $('#test_panel').fadeIn('slow');
+                  $('#test_panel').fadeIn('slow', function () {
+                      setInterval(function () {
+                          set_counter()
+                      }, 1000);
+                  });
               });
           });
           for (i = 1; i < 9; i++) {
@@ -20,10 +26,38 @@
 
               });
           }
+          $(".submit_btn").on("click", function () {
+              alert("your test is submitted successfully");
+          });
+
+
       });
+      function set_counter() {
+          if (sec == 0) {
+              sec = 59;
+              min -= 1
+          } else
+              sec -= 1;
+
+          if (min < 0) {
+              min = 59;
+              hours -= 1;
+          }
+          if (hours < 0)
+              $(".submit_btn").click();
+          else
+              $('#counter').text(leftPad(hours, 2) + ':' + leftPad(min, 2) + ':' + leftPad(sec, 2));
+      }
+      function leftPad(number, targetLength) {
+          var output = number + '';
+          while (output.length < targetLength) {
+              output = '0' + output;
+          }
+          return output;
+      }
   </script>
-  <link href="css/main.css" rel="stylesheet">
-  <link href="css/test.css" rel="stylesheet">
+  <link href="assets/main.css" rel="stylesheet">
+  <link href="assets/test.css" rel="stylesheet">
 </head>
 <body>
 <div id='instruction_panel'>
@@ -65,11 +99,12 @@
     TestIT
   </div>
   <div id='counter'>
-    Counter
+
   </div>
   <div class="name_div"><h3>Hi, Nikunj Thakkar </h3></div>
 
 </div>
+<form method="post" action="/test_submit">
 <div id='left_panel'>
   <a href='#' id='q1' class="question_list">Question 1</a>
   <a href='#' id='q2' class="question_list">Question 2</a>
@@ -79,11 +114,9 @@
   <a href='#' id='q6' class="question_list">Question 6</a>
   <a href='#' id='q7' class="question_list">Question 7</a>
   <a href='#' id='q8' class="question_list">Question 8</a>
-
-  <div class="submit_btn red_button">Submit Text</div>
+  <input type="submit" value="Submit Text" class="submit_btn red_button">
 </div>
 <div id='main_content'>
-
 <div id='q1_div' style="display: block" class='content active'>
   <h3>Question 1 >> Fill in the blank<span class="weightage">(1 X 10)</span></h3>
   <hr>
@@ -93,14 +126,18 @@
         <li>
           <div class="srno_field"><%= (index+1) %></div>
           <div class="que_field"><%= fill.cipher %></div>
-          <div class="ans_field"><input type="text" size="15" id="<%= fill.id %>"></div>
+          <input type="hidden" value="<%= fill.id %>">
+
+          <div class="ans_field"><input type="text" size="15" name="<%= fill.id %>"></div>
         </li>
     <% end %>
     <% @fill_in_the_blank_next.each_with_index do |fill, index| %>
         <li>
           <div class="srno_field"><%= (index+7) %></div>
           <div class="que_field"><%= fill.cipher %></div>
-          <div class="ans_field"><input type="text" size="15" id="<%= fill.id %>"></div>
+          <input type="hidden" value="<%= fill.id %>">
+
+          <div class="ans_field"><input type="text" size="15" name="<%= fill.id %>"></div>
         </li>
     <% end %>
   </ol>
@@ -114,8 +151,10 @@
         <li>
           <div class="srno_field"><%= (index+1) %></div>
           <div class="que_field"><%= tf.cipher %></div>
-          <div class="ans_field"><input type="radio" name="<%= tf.id %>" value="True">True &nbsp;&nbsp;
-            <input type="radio" name="<%= tf.id %>">False
+          <input type="hidden" value="<%= tf.id %>">
+
+          <div class="ans_field"><input type="radio" name="tf<%= index %>" value="True">True &nbsp;&nbsp;
+            <input type="radio" name="tf<%= index %>">False
           </div>
         </li>
     <% end %>
@@ -123,7 +162,9 @@
         <li>
           <div class="srno_field"><%= (index+7) %></div>
           <div class="que_field"><%= tf.cipher %></div>
-          <div class="ans_field"><input type="radio" name="<%= tf.id %>" value="True">True &nbsp;&nbsp;
+          <input type="hidden" value="<%= tf.id %>">
+
+          <div class="ans_field"><input type="radio" name="tf<%= (index+7) %>" value="True">True &nbsp;&nbsp;
             <input type="radio" name="<%= tf.id %>">False
           </div>
         </li>
@@ -147,7 +188,10 @@
           <div class="ans_field_mcq">
             <ul>
               <% qn.options.each do |option| %>
-                  <li><input type="radio" name="<%= qn.id %>" id="<%= option.id %>"><%= option.key %></li>
+                  <li>
+                    <input type="hidden" value="<%= qn.id %>">
+                    <input type="radio" name="<%= qn.id %>" id="<%= option.id %>" value="<%= option.val %>"><%= option.key %>
+                  </li>
               <% end %>
             </ul>
           </div>
@@ -163,7 +207,10 @@
           <div class="ans_field_mcq">
             <ul>
               <% qn.options.each do |option| %>
-                  <li><input type="radio" name="<%= qn.id %>" id="<%= option.id %>"><%= option.key %></li>
+                  <li>
+                    <input type="hidden" value="<%= qn.id %>">
+                    <input type="radio" name="<%= qn.id %>" id="<%= option.id %>" value="<%= option.val %>"><%= option.key %>
+                  </li>
               <% end %>
             </ul>
           </div>
@@ -186,7 +233,10 @@
           <div class="ans_field_mcq">
             <ul>
               <% qn.options.each do |option| %>
-                  <li><input type="checkbox" name="<%= qn.id %>" id="<%= option.id %>"><%= option.key %></li>
+                  <li>
+                    <input type="hidden" value="<%= qn.id %>">
+                    <input type="checkbox" name="<%= qn.id %>" id="<%= option.id %>" value="<%= option.val %>"><%= option.key %>
+                  </li>
               <% end %>
             </ul>
           </div>
@@ -209,7 +259,10 @@
           <div class="ans_field_mcq">
             <ul>
               <% qn.options.each do |option| %>
-                  <li><input type="checkbox" name="<%= qn.id %>" id="<%= option.id %>"><%= option.key %></li>
+                  <li>
+                    <input type="hidden" value="<%= qn.id %>">
+                    <input type="checkbox" value="<%= option.val %>" name="<%= qn.id %>" id="<%= option.id %>"><%= option.key %>
+                  </li>
               <% end %>
             </ul>
           </div>
@@ -232,7 +285,9 @@
           <div class="ans_field_mcq">
             <ul>
               <% qn.options.each do |option| %>
-                  <li><input type="text" name="<%= qn.id %>" id="<%= option.id %>"></li>
+                  <li>
+                    <input type="text" name="<%= qn.id %>" id="<%= option.id %>">
+                  </li>
               <% end %>
             </ul>
           </div>
@@ -286,7 +341,7 @@
     <li>
       <div class="srno_field">1</div>
       <div class="que_field_html">
-        <img src='img/output.png'></img>
+        <img src='assets/output.png'></img>
       </div>
       <br>
       <br>
@@ -298,7 +353,7 @@
     <li>
       <div class="srno_field">1</div>
       <div class="que_field_html">
-        <img src='img/output.png'></img>
+        <img src='assets/output.png'></img>
       </div>
       <br>
       <br>
@@ -310,6 +365,7 @@
   </ol>
 </div>
 </div>
+</form>
 </div>
 </body>
 </html>
