@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>TestIT - A platform for FYJC students of Mumbai University to give online IT Tests</title>
+  <%= csrf_meta_tag %>
   <!--<script type="text/javascript" src="assets/jquery.js"></script>-->
   <script type="text/javascript">
       var hours = 2, min = 30, sec = 00;
@@ -26,9 +27,9 @@
 
               });
           }
-          $(".submit_btn").on("click", function () {
-              alert("your test is submitted successfully");
-          });
+//          $(".submit_btn").on("click", function () {
+//              alert("your test is submitted successfully");
+//          });
 
 
       });
@@ -104,7 +105,9 @@
   <div class="name_div"><h3>Hi, Nikunj Thakkar </h3></div>
 
 </div>
-<form method="post" action="/test_submit">
+<form method="post" action="<%= test_submit_path %>">
+<input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
+
 <div id='left_panel'>
   <a href='#' id='q1' class="question_list">Question 1</a>
   <a href='#' id='q2' class="question_list">Question 2</a>
@@ -114,7 +117,7 @@
   <a href='#' id='q6' class="question_list">Question 6</a>
   <a href='#' id='q7' class="question_list">Question 7</a>
   <a href='#' id='q8' class="question_list">Question 8</a>
-  <input type="submit" value="Submit Text" class="submit_btn red_button">
+  <input type="submit" value="Submit Test" class="submit_btn red_button">
 </div>
 <div id='main_content'>
 <div id='q1_div' style="display: block" class='content active'>
@@ -153,8 +156,8 @@
           <div class="que_field"><%= tf.cipher %></div>
           <input type="hidden" value="<%= tf.id %>">
 
-          <div class="ans_field"><input type="radio" name="tf<%= index %>" value="True">True &nbsp;&nbsp;
-            <input type="radio" name="tf<%= index %>">False
+          <div class="ans_field"><input type="radio" name="<%= tf.id %>" value="True">True &nbsp;&nbsp;
+            <input type="radio" name="<%= tf.id %>">False
           </div>
         </li>
     <% end %>
@@ -164,7 +167,7 @@
           <div class="que_field"><%= tf.cipher %></div>
           <input type="hidden" value="<%= tf.id %>">
 
-          <div class="ans_field"><input type="radio" name="tf<%= (index+7) %>" value="True">True &nbsp;&nbsp;
+          <div class="ans_field"><input type="radio" name="<%= tf.id %>" value="True">True &nbsp;&nbsp;
             <input type="radio" name="<%= tf.id %>">False
           </div>
         </li>
@@ -308,7 +311,7 @@
           <br>
 
           <div class="ans_field_mcq">
-            <textarea id="<%= qn.id %>"></textarea>
+            <textarea name="<%= qn.id %>" id="<%= qn.id %>"></textarea>
           </div>
         </li>
     <% end %>
@@ -327,7 +330,7 @@
           <br>
 
           <div class="ans_field_mcq">
-            <textarea id="<%= qn.id %>"></textarea>
+            <textarea name="<%= qn.id %>" id="<%= qn.id %>"></textarea>
           </div>
         </li>
     <% end %>

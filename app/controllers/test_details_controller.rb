@@ -40,6 +40,9 @@ class TestDetailsController < ApplicationController
   # POST /test_details
   # POST /test_details.json
   def create
+    render json: params
+    return
+
     @test_detail = TestDetail.new(params[:test_detail])
 
     respond_to do |format|
@@ -80,4 +83,15 @@ class TestDetailsController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  # Used for checking the test being submitted by user.
+  def test_submit
+    received_params = params
+    received_params.delete(:authenticity_token)
+    received_params.delete(:controller)
+    received_params.delete(:action)
+
+
+  end
+
 end
