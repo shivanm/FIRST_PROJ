@@ -154,10 +154,11 @@
         <li>
           <div class="srno_field"><%= (index+1) %></div>
           <div class="que_field"><%= tf.cipher %></div>
-          <input type="hidden" value="<%= tf.id %>">
 
-          <div class="ans_field"><input type="radio" name="<%= tf.id %>" value="True">True &nbsp;&nbsp;
-            <input type="radio" name="<%= tf.id %>">False
+          <div class="ans_field">
+            <input type="radio" name="<%= tf.id %>" value="True">True &nbsp;&nbsp;
+            <input type="radio" name="<%= tf.id %>" value="False">False
+            <input type="radio" name="<%= tf.id %>" value="None" class='hide' checked="true">
           </div>
         </li>
     <% end %>
@@ -165,10 +166,11 @@
         <li>
           <div class="srno_field"><%= (index+7) %></div>
           <div class="que_field"><%= tf.cipher %></div>
-          <input type="hidden" value="<%= tf.id %>">
 
-          <div class="ans_field"><input type="radio" name="<%= tf.id %>" value="True">True &nbsp;&nbsp;
+          <div class="ans_field">
+            <input type="radio" name="<%= tf.id %>" value="True">True &nbsp;&nbsp;
             <input type="radio" name="<%= tf.id %>">False
+            <input type="radio" name="<%= tf.id %>" value="None" class='hide' checked="true">
           </div>
         </li>
     <% end %>
@@ -192,10 +194,12 @@
             <ul>
               <% qn.options.each do |option| %>
                   <li>
-                    <input type="hidden" value="<%= qn.id %>">
-                    <input type="radio" name="<%= qn.id %>" id="<%= option.id %>" value="<%= option.val %>"><%= option.key %>
+                    <input type="radio" name="<%= qn.id %>" value="<%= option.val %>"><%= option.key %>
                   </li>
               <% end %>
+              <li>
+                <input type="radio" name="<%= qn.id %>" value="None" class='hide' checked="true">
+              </li>
             </ul>
           </div>
         </li>
@@ -211,10 +215,12 @@
             <ul>
               <% qn.options.each do |option| %>
                   <li>
-                    <input type="hidden" value="<%= qn.id %>">
                     <input type="radio" name="<%= qn.id %>" id="<%= option.id %>" value="<%= option.val %>"><%= option.key %>
                   </li>
               <% end %>
+              <li>
+                <input type="radio" name="<%= qn.id %>" value="None" class='hide' checked="true">
+              </li>
             </ul>
           </div>
         </li>
@@ -235,10 +241,12 @@
 
           <div class="ans_field_mcq">
             <ul>
-              <% qn.options.each do |option| %>
+              <li>
+                <input type="checkbox" name="<%= qn.id %>" value="None" class='hide' checked="true">
+              </li>
+              <% qn.options.each_with_index do |option, index| %>
                   <li>
-                    <input type="hidden" value="<%= qn.id %>">
-                    <input type="checkbox" name="<%= qn.id %>" id="<%= option.id %>" value="<%= option.val %>"><%= option.key %>
+                    <input type="checkbox" name="<%= qn.id %>_<%= index %>" id="<%= option.id %>" value="<%= option.id %>"><%= option.key %>
                   </li>
               <% end %>
             </ul>
@@ -263,10 +271,12 @@
             <ul>
               <% qn.options.each do |option| %>
                   <li>
-                    <input type="hidden" value="<%= qn.id %>">
                     <input type="checkbox" value="<%= option.val %>" name="<%= qn.id %>" id="<%= option.id %>"><%= option.key %>
                   </li>
               <% end %>
+              <li>
+                <input type="checkbox" name="<%= qn.id %>" value="None" class='hide' checked="true">
+              </li>
             </ul>
           </div>
         </li>

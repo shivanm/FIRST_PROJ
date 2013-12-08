@@ -150,3 +150,7 @@ a {
     width: 125px;
     box-shadow:  0px 0px 2px #000
 }
+
+.hide{
+    display: none;
+}

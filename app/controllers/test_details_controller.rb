@@ -91,7 +91,25 @@ class TestDetailsController < ApplicationController
     received_params.delete(:controller)
     received_params.delete(:action)
 
+    render json: received_params
+    return
 
+    @test = TestResult.create(user_id: current_user.id)
+
+    received_params.each do |param|
+      @question = Question.find(param[0].to_i)
+      ans = param[1]
+      if (@question.type == 'FillInTheBlank' || @question.type == 'Rearrange')
+        if (@question.options.first.key.casecmp(ans) == 0)
+          score = 1
+        else
+          score = 0
+        end
+        @test.test_details << {question_id: @question.id, answer: ans, user_id: current_user.id, score: score}
+      elsif(@question.type == 'TrueFalse' || @question.type == 'Mcq1')
+        @test.test_details << {question_id: @question.id, answer: ans, user_id: current_user.id, score: @question.options.find()}
+      end
+    end
   end
 
 end

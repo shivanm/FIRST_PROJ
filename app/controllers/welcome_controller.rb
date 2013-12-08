@@ -11,6 +11,8 @@ class WelcomeController < ApplicationController
     if !@previous_question_set.blank?
       #@fill_in_the_blank_chapter = Question.find_by_sql("select * from (SELECT *, row_number() over (partition by chapter_id order by random()) FROM questions LEFT OUTER JOIN test_details on test_details.question_id != questions.id where questions.type = 'FillInTheBlank') a where row_number=1;")
       @fill_in_the_blank = Question.find_by_sql("select * from (SELECT *, row_number() over (partition by chapter_id order by random()) FROM questions where questions.type = 'FillInTheBlank' AND questions.id NOT IN (" + @previous_question_set.map { |i| i.question_id }.to_s.gsub('[', '').gsub(']', '') + ")) a where row_number=1;").sample(6)
+      #render json: @fill_in_the_blank
+      #return
       @fill_in_the_blank_next = Question.where(type: 'FillInTheBlank').where(['id NOT IN (?)', @fill_in_the_blank.map { |q| q.id }]).order('RANDOM()').limit(4).sample(4)
 
       @true_false = Question.find_by_sql("select * from (SELECT *, row_number() over (partition by chapter_id order by random()) FROM questions where questions.type = 'TrueFalse' AND questions.id NOT IN (" + @previous_question_set.map { |i| i.question_id }.to_s.gsub('[', '').gsub(']', '') + ")) a where row_number=1;").sample(6)
@@ -53,26 +55,25 @@ class WelcomeController < ApplicationController
       @html_code = Question.where(type: 'CodingOutput').order('RANDOM()').limit(2)
     end
 
-    insert_string = SetObj.insert_obj(@fill_in_the_blank, current_user.id)
-    insert_string << SetObj.insert_obj(@fill_in_the_blank_next, current_user.id)
-    insert_string << SetObj.insert_obj(@true_false, current_user.id)
-    insert_string << SetObj.insert_obj(@true_false_next, current_user.id)
-    insert_string << SetObj.insert_obj(@mcq1, current_user.id)
-    insert_string << SetObj.insert_obj(@mcq1_next, current_user.id)
-    insert_string << SetObj.insert_obj(@mcq2, current_user.id)
-    insert_string << SetObj.insert_obj(@mcq3, current_user.id)
-    insert_string << SetObj.insert_obj(@rearrange, current_user.id)
-    insert_string << SetObj.insert_obj(@short_note_1, current_user.id)
-    insert_string << SetObj.insert_obj(@short_note_2, current_user.id)
-    insert_string << SetObj.insert_obj(@html_code, current_user.id)
-
-    final_string = insert_string.to_s.gsub('[', '').gsub(']', '').gsub(', ,', '').gsub(' ,', '')#.split(', ')
-
-    render json: final_string
-    return
-
-    @test = TestResult.create(user_id: current_user.id)
-    @test.test_details << final_string
+    #insert_string = SetObj.insert_obj(@fill_in_the_blank, current_user.id)
+    #insert_string << SetObj.insert_obj(@fill_in_the_blank_next, current_user.id)
+    #insert_string << SetObj.insert_obj(@true_false, current_user.id)
+    #insert_string << SetObj.insert_obj(@true_false_next, current_user.id)
+    #insert_string << SetObj.insert_obj(@mcq1, current_user.id)
+    #insert_string << SetObj.insert_obj(@mcq1_next, current_user.id)
+    #insert_string << SetObj.insert_obj(@mcq2, current_user.id)
+    #insert_string << SetObj.insert_obj(@mcq3, current_user.id)
+    #insert_string << SetObj.insert_obj(@rearrange, current_user.id)
+    #insert_string << SetObj.insert_obj(@short_note_1, current_user.id)
+    #insert_string << SetObj.insert_obj(@short_note_2, current_user.id)
+    #insert_string << SetObj.insert_obj(@html_code, current_user.id)
+    #
+    #final_string = insert_string.to_s.gsub('[', '').gsub(']', '').gsub(', ,', '').gsub(' ,', '').gsub('} ', '}')#.split(', ')
+    #final_string = '[' + final_string + ']'
+    #render json: final_string.to_json
+    #return
+    #@test = TestResult.create(user_id: current_user.id)
+    #@test.test_details << final_string
 
   end
 
@@ -91,12 +92,12 @@ class WelcomeController < ApplicationController
 
 end
 
-class SetObj
-  def self.insert_obj(obj, user_id)
-    return_str = []
-    obj.each do |obj|
-      return_str << {question_id: obj.id, user_id: user_id}
-    end
-    return return_str
-  end
-end
+#class SetObj
+#  def self.insert_obj(obj, user_id)
+#    return_str = []
+#    obj.each do |obj|
+#      return_str << {question_id: obj.id, user_id: user_id}
+#    end
+#    return return_str
+#  end
+#end
