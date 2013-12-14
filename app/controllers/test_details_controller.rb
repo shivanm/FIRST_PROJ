@@ -91,31 +91,41 @@ class TestDetailsController < ApplicationController
     received_params.delete(:controller)
     received_params.delete(:action)
 
-    render json: received_params
-    return
+    #render json: received_params
+    #return
 
-    @question = []
-    ans = []
     @test = TestResult.create(user_id: current_user.id)
 
     received_params.each do |param|
-      if(param[0].include?('_'))
-        @question << Question.find (param[0].split('_')[0].to_i)
-      else
-        @question << Question.find (param[0].to_i)
-      end
-
+      @question = Question.find (param[0])
+      (param[1] === '' || param[1] === 'None')?ans='Not Attempted' :ans = param[1]
+      puts '======== > > ' + ans.to_s
+      final_ans = ''
+      score = 0
       if (@question.type == 'FillInTheBlank' || @question.type == 'Rearrange')
-        (@question.options.first.key.casecmp(ans) == 0)? score = 1: score = 0
-        @test.test_details << {question_id: @question.id, answer: ans, user_id: current_user.id, score: score}
+        @option = Option.where(question_id: param[0])
+        @option.each do |option|
+          (option.key.casecmp(ans) == 0) ? score = @question.options.first.val : score = 0
+        end
+        @test.test_details.create(question_id: @question.id, answer: ans, user_id: current_user.id, score: score)
       elsif (@question.type == 'TrueFalse' || @question.type == 'Mcq1')
         if (ans.include?('_'))
-          @test.test_details << {question_id: @question.id, answer: ans.split('_')[0], user_id: current_user.id, score: ans.split('_')[1]}
-        elsif (ans != 'None')
-          @test.test_details << {question_id: @question.id, answer: ans, user_id: current_user.id, score: @question.options.find_by_key(ans).val}
+          @test.test_details.create(question_id: @question.id, answer: ans.split('_')[0], user_id: current_user.id, score: ans.split('_')[1])
         else
-          @test.test_details << {question_id: @question.id, answer: 'Not Attempted', user_id: current_user.id, score: 0}
+          @test.test_details.create(question_id: @question.id, answer: ans, user_id: current_user.id, score: 0)
         end
+      elsif (@question.type == 'Mcq2' || @question.type == 'Mcq3')
+        ans.each do |answer|
+          if (answer != 'None')
+            @option = Option.find(answer.to_i)
+            final_ans += @option.key + '||'
+            score += @option.val
+          end
+        end
+        (final_ans.nil?)? final_ans: final_ans = 'Not Attempted'
+        @test.test_details.create(question_id: @question.id, answer: final_ans, user_id: current_user.id, score: score)
+      else
+        @test.test_details.create(question_id: @question.id, answer: ans, user_id: current_user.id)
       end
     end
   end

@@ -105,7 +105,7 @@
   <div class="name_div"><h3>Hi, Nikunj Thakkar </h3></div>
 
 </div>
-<form method="post" action="<%= test_submit_path %>">
+<form method="post" action="/test_submit">
 <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
 
 <div id='left_panel'>
@@ -242,11 +242,11 @@
           <div class="ans_field_mcq">
             <ul>
               <li>
-                <input type="checkbox" name="<%= qn.id %>" value="None" class='hide' checked="true">
+                <%= check_box_tag(qn.id.to_s + '[]', 'None', checked = true, options = {class: 'hide'}) %>
               </li>
               <% qn.options.each_with_index do |option, index| %>
                   <li>
-                    <input type="checkbox" name="<%= qn.id %>_<%= index %>" id="<%= option.id %>" value="<%= option.id %>"><%= option.key %>
+                    <%= check_box_tag(qn.id.to_s + '[]', option.id, checked = false, options = {}) %><%= option.key %>
                   </li>
               <% end %>
             </ul>
@@ -269,14 +269,14 @@
 
           <div class="ans_field_mcq">
             <ul>
+              <li>
+                <%= check_box_tag(qn.id.to_s + '[]', 'None', checked = true, options = {class: 'hide'}) %>
+              </li>
               <% qn.options.each do |option| %>
                   <li>
                     <input type="checkbox" value="<%= option.val %>" name="<%= qn.id %>" id="<%= option.id %>"><%= option.key %>
                   </li>
               <% end %>
-              <li>
-                <input type="checkbox" name="<%= qn.id %>" value="None" class='hide' checked="true">
-              </li>
             </ul>
           </div>
         </li>
