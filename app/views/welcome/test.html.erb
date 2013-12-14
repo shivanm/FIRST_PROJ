@@ -194,7 +194,7 @@
             <ul>
               <% qn.options.each do |option| %>
                   <li>
-                    <input type="radio" name="<%= qn.id %>" value="<%= option.val %>"><%= option.key %>
+                    <input type="radio" name="<%= qn.id %>" value="<%= option.key %>_<%= option.val %>"><%= option.key %>
                   </li>
               <% end %>
               <li>
@@ -215,7 +215,7 @@
             <ul>
               <% qn.options.each do |option| %>
                   <li>
-                    <input type="radio" name="<%= qn.id %>" id="<%= option.id %>" value="<%= option.val %>"><%= option.key %>
+                    <input type="radio" name="<%= qn.id %>" id="<%= option.id %>" value="<%= option.key %>_<%= option.val %>"><%= option.key %>
                   </li>
               <% end %>
               <li>

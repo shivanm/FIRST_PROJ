@@ -94,20 +94,28 @@ class TestDetailsController < ApplicationController
     render json: received_params
     return
 
+    @question = []
+    ans = []
     @test = TestResult.create(user_id: current_user.id)
 
     received_params.each do |param|
-      @question = Question.find(param[0].to_i)
-      ans = param[1]
+      if(param[0].include?('_'))
+        @question << Question.find (param[0].split('_')[0].to_i)
+      else
+        @question << Question.find (param[0].to_i)
+      end
+
       if (@question.type == 'FillInTheBlank' || @question.type == 'Rearrange')
-        if (@question.options.first.key.casecmp(ans) == 0)
-          score = 1
-        else
-          score = 0
-        end
+        (@question.options.first.key.casecmp(ans) == 0)? score = 1: score = 0
         @test.test_details << {question_id: @question.id, answer: ans, user_id: current_user.id, score: score}
-      elsif(@question.type == 'TrueFalse' || @question.type == 'Mcq1')
-        @test.test_details << {question_id: @question.id, answer: ans, user_id: current_user.id, score: @question.options.find()}
+      elsif (@question.type == 'TrueFalse' || @question.type == 'Mcq1')
+        if (ans.include?('_'))
+          @test.test_details << {question_id: @question.id, answer: ans.split('_')[0], user_id: current_user.id, score: ans.split('_')[1]}
+        elsif (ans != 'None')
+          @test.test_details << {question_id: @question.id, answer: ans, user_id: current_user.id, score: @question.options.find_by_key(ans).val}
+        else
+          @test.test_details << {question_id: @question.id, answer: 'Not Attempted', user_id: current_user.id, score: 0}
+        end
       end
     end
   end
