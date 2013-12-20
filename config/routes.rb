@@ -4,11 +4,13 @@ Ittest::Application.routes.draw do
   resources :test_details
   resources :test_results
   resources :chapters
-  devise_for :users #do
-  #  get '/users/sign_out' => 'devise/sessionsd#destroy'
-  #end
+  devise_for :users
 
-  get '/users/sign_out' => 'Devise::Sessions#destroy'
+  #match 'auth/:provider/callback', to: 'sessions#create'
+  #match 'auth/failure', to: redirect('/')
+  devise_scope :user do
+    match '/users/sign_out', to: 'Devise::sessions#destroy', as: 'signout'
+  end
 
   mount RailsAdmin::Engine => '/admin', :as => 'rails_admin'
 
@@ -17,7 +19,7 @@ Ittest::Application.routes.draw do
   post '/importing_questions' => "questions#import", :as => :importing_questions
   match '/test' => 'welcome#test', as: :test
   match '/test_submit' => 'test_details#test_submit', as: :test_submit
-
+  match '/show_results' => 'test_details#show_details'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

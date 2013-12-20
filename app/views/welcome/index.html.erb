@@ -1,9 +1,8 @@
 <div id='top_bar'>
     <div id='logo'>
-        TestIT
+        Let.Me.Practice.
     </div>
-    <%= link_to 'Logout', '/users/sign_out', id:"logout_btn", class:"red_button"%>
-    <!--<div id="logout_btn" class="red_button">Logout</div>-->
+    <%= link_to 'Logout', signout_path, id:"logout_btn", class:"red_button"%>
     <div id="contact_us_btn" class="light_button">Contact Us</div>
 </div>
 <div id="container">
@@ -11,8 +10,7 @@
         <h2>Hi, <%= @user.name %> ...</h2>
         <h2>You have <span id='test_left'><%= @test_count %></span> tests left.</h2>
         <br>
-        <!--<div id="view_report" class="green_button">View Reports</div>-->
-        <%= link_to 'View Reports', test_path, id: "view_report", class:"green_button" %>
+        <%= link_to 'View Reports', test_results_path, id: "view_report", class:"green_button" %>
         <br>
         <br>
         <br>

@@ -12,6 +12,7 @@ gem 'execjs'
 gem 'therubyracer'
 gem 'paperclip'
 gem 'roo'
+gem 'omniauth-facebook'
 
 
 # Gems used only for assets and not required

@@ -1,16 +1,39 @@
 <div id='top_bar'>
   <div id='logo'>
-    TestIT
+    Let.Me.Practice.
   </div>
   <div id="contact_us_btn" class="light_button">Contact Us</div>
 </div>
 <div id='container'>
-  <div id='intro_panel'>
-    <div id='about_content'>
-      KYUGSYUACUYAEGYUE
+  <div id='intro_panel' class='panel' style="display:block;">
+    <div id='about_content' class='panelcontent'>
+      <p class="lead">Dear Students!!
+        <br>Here's on-line platform is to provide a simulation experience of HSC IT exams of Maharashtra State Board.
+      </p>
+
+      <p class="bodytext">Your first reaction might be WHY??Is it needed??? Here&#39;s your answer:</p>
+      <ol class="bodytext">
+        <li>Till today you are habituated with paper-pen. Suddenly the <span class="redtext">change of interface</span>
+          from paper-pen to click-keyboard will definitely be different and challenge could be writing speed
+          oops!!<span class="redtext">Typing speed.</span></li>
+        <li>Students do mark few questions to attempt at the end. In hurry and tension of exam these questions might be
+          left unanswered as there is <span class="redtext">no marking facility</span> it online.
+        </li>
+        <li>It is not only the change in conduct of exam but also change in evaluation pattern.Though you know the
+          answer you may loose marks as the <span class="redtext">machine evaluation</span> will not consider any
+          spelling cliches.
+        </li>
+      </ol>
+      <p class="bodytext">So, we take this challenge to provide not only
+        <span class="greentext">simulation of online IT examination</span> but also make you practice to the extent that
+        builds <span class="greentext">confidence in the subject.</span></p>
+
+      <p class="bluetext"><b>Let&#39;s practice together and conquer IT!!</b></p>
+
     </div>
   </div>
   <div id=login_panel>
+
     <h4 class="lighter bigger header">Sign-in</h4>
 
     <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
@@ -20,8 +43,10 @@
         </div>
         <div class="login_lower">
           <%= f.submit "Sign in", class: "blue_button", id: "login_btn" %>
-          <%= link_to "Not Registered? Sign Up", new_registration_path(resource_name), id:"sign_up_btn", class:"red_button" %><br />
-          <%= link_to "Sign In as Guest", '/create_guest', id:"guest_signin_btn", class:"green_button" %><br />
+          <%= link_to "Not Registered? Sign Up", new_registration_path(resource_name), id: "sign_up_btn", class: "red_button" %>
+          <br/>
+          <%= link_to "Sign In as Guest", '/create_guest', id: "guest_signin_btn", class: "green_button" %>
+          <br/>
         </div>
     <% end %>
 

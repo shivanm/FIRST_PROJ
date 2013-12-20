@@ -93,6 +93,10 @@ ActiveRecord::Schema.define(:version => 20131027170314) do
     t.boolean  "is_admin",               :default => false
     t.boolean  "has_paid",               :default => false
     t.boolean  "is_guest",               :default => true
+    t.string   "uid"
+    t.string   "provider"
+    t.string   "oauth_token"
+    t.datetime "oauth_expires_at"
     t.datetime "created_at",                                                      :null => false
     t.datetime "updated_at",                                                      :null => false
   end

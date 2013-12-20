@@ -17,24 +17,16 @@
     <div id="instruction_content">
       <ol>
         <li>These instructions are for the online practice tests that you are about to start.
-          In the HSC IT exam, you will see similar instructions screen with all the required information for the test.
-          Please read it carefully as you will not be able to see instructions again in between the exam.
-        </li>
-        <li>All questions are compulsory in the test so you should review all the questions before submitting the test.
-          There is NO negative marking for any wrong answers.
+          In the HSC IT exam, you will see similar instructions screen with all the required information for the test. Please read it carefully as you will not be able to see instructions again in between the exam.</li>
+        <li>All questions are compulsory in the test so you should review all the questions before submitting the test. There is NO negative marking for any wrong answers.
         </li>
         <li>You will be provided with two and half hours to complete HSC Online IT test Examination.
-          For you to experiment, in this practice tests, you will be given an option to set duration for the tests. We
-          recommend you to start with 3 hours time limit and as you give more tests, reduce the duration to less than 2
-          hours.
+          For you to experiment, in this practice tests, you will be given an option to set duration for the tests. We recommend you to start with 3 hours time limit and as you give more tests, reduce the duration to less than 2 hours.
         </li>
         <li>In case the time period gets over,test will be automatically submitted.
-          Also make sure you have good internet connection, because if you start the test and do not finish by clicking
-          SUBMIT button, your test will be set as void. You will not be able to restart the test if internet connection
-          is lost in between.
+          Also make sure you have good internet connection, because if you start the test and do not finish by clicking SUBMIT button, your test will be set as void. You will not be able to restart the test if internet connection is lost in between.
         </li>
-        <li>After completing the test, your score will be displayed on the screen. Also to improve your learning, you
-          will be able to review your test results and compare it will previous tests.
+        <li>After completing the test, your score will be displayed on the screen. Also to improve your learning, you will be able to review your test results and compare it will previous tests.
         </li>
       </ol>
 
@@ -72,11 +64,12 @@
   <h3>Question 1 >> Fill in the blank<span class="weightage">(1 X 10)</span></h3>
   <hr>
   <br>
-  <ol class="test_question" id='fill'>
+   <ol class="test_question" id='fill'>
     <% @fill_in_the_blank.each_with_index do |fill, index| %>
         <li>
           <div class="srno_field"><%= (index+1) %></div>
           <div class="que_field"><%= fill.cipher %></div>
+          <!--<input type="hidden" value="<%= fill.id %>">-->
 
           <div class="ans_field"><input type="text" size="15" name="<%= fill.id %>"></div>
         </li>
@@ -85,6 +78,7 @@
         <li>
           <div class="srno_field"><%= (index+7) %></div>
           <div class="que_field"><%= fill.cipher %></div>
+         <!-- <input type="hidden" value="<%= fill.id %>">-->
 
           <div class="ans_field"><input type="text" size="15" name="<%= fill.id %>"></div>
         </li>
@@ -104,8 +98,11 @@
           <div class="ans_field">
             <input type="radio" name="<%= tf.id %>" value="None" class='hide' checked="true">
             <% tf.options.each do |option| %>
-                <input type="radio" name="<%= tf.id %>" value="<%= option.key %>_<%= option.val %>"><%= option.key %>
+                  <input type="radio" name="<%= tf.id %>" value="<%= option.key %>_<%= option.val %>"><%= option.key %>
             <% end %>
+           <!-- <input type="radio" name="<%= tf.id %>" value="True">True &nbsp;&nbsp;-->
+            <!--<input type="radio" name="<%= tf.id %>" value="False">False-->
+
           </div>
         </li>
     <% end %>
@@ -119,6 +116,9 @@
             <% tf.options.each do |option| %>
                 <input type="radio" name="<%= tf.id %>" value="<%= option.key %>_<%= option.val %>"><%= option.key %>
             <% end %>
+           <!-- <input type="radio" name="<%= tf.id %>" value="True">True &nbsp;&nbsp;
+            <input type="radio" name="<%= tf.id %>">False
+            <input type="radio" name="<%= tf.id %>" value="None" class='hide' checked="true">-->
           </div>
         </li>
     <% end %>
@@ -139,14 +139,16 @@
           <br>
 
           <div class="ans_field_mcq">
+            <ul>
               <% qn.options.each do |option| %>
-                  <p>
+                  <li>
                     <input type="radio" name="<%= qn.id %>" value="<%= option.key %>_<%= option.val %>"><%= option.key %>
-                  </p>
+                  </li>
               <% end %>
-              <p class='hide'>
-                <input type="radio" name="<%= qn.id %>" value="None" checked="true">
-              </p>
+              <li>
+                <input type="radio" name="<%= qn.id %>" value="None" class='hide' checked="true">
+              </li>
+            </ul>
           </div>
         </li>
     <% end %>
@@ -158,14 +160,16 @@
           <br>
 
           <div class="ans_field_mcq">
-            <% qn.options.each do |option| %>
-                <p>
-                  <input type="radio" name="<%= qn.id %>" id="<%= option.id %>" value="<%= option.key %>_<%= option.val %>"><%= option.key %>
-                </p>
-            <% end %>
-            <p class='hide'>
-              <input type="radio" name="<%= qn.id %>" value="None" checked="true">
-            </p>
+            <ul>
+              <% qn.options.each do |option| %>
+                  <li>
+                    <input type="radio" name="<%= qn.id %>" id="<%= option.id %>" value="<%= option.key %>_<%= option.val %>"><%= option.key %>
+                  </li>
+              <% end %>
+              <li>
+                <input type="radio" name="<%= qn.id %>" value="None" class='hide' checked="true">
+              </li>
+            </ul>
           </div>
         </li>
     <% end %>
@@ -184,12 +188,16 @@
           <br>
 
           <div class="ans_field_mcq">
-            <p class='hide'>
-              <%= check_box_tag(qn.id.to_s + '[]', 'None', checked = true, options = {}) %>
-            </p>
-            <% qn.options.each_with_index do |option, index| %>
-                <p><%= check_box_tag(qn.id.to_s + '[]', option.id, checked = false, options = {}) %><%= option.key %></p>
-            <% end %>
+            <ul>
+              <li>
+                <%= check_box_tag(qn.id.to_s + '[]', 'None', checked = true, options = {class: 'hide'}) %>
+              </li>
+              <% qn.options.each_with_index do |option, index| %>
+                  <li>
+                    <%= check_box_tag(qn.id.to_s + '[]', option.id.to_s + '_' + option.val.to_s, checked = false, options = {}) %><%= option.key %>
+                  </li>
+              <% end %>
+            </ul>
           </div>
         </li>
     <% end %>
@@ -208,12 +216,16 @@
           <br>
 
           <div class="ans_field_mcq">
-            <p class='hide'>
-              <%= check_box_tag(qn.id.to_s + '[]', 'None', checked = true, options = {}) %>
-            </p>
-            <% qn.options.each_with_index do |option, index| %>
-                <p><%= check_box_tag(qn.id.to_s + '[]', option.id, checked = false, options = {}) %><%= option.key %></p>
-            <% end %>
+            <ul>
+              <li>
+                <%= check_box_tag(qn.id.to_s + '[]', 'None', checked = true, options = {class: 'hide'}) %>
+              </li>
+              <% qn.options.each_with_index do |option, index| %>
+                  <li>
+                    <%= check_box_tag(qn.id.to_s + '[]', option.id.to_s + '_' + option.val.to_s, checked = false, options = {}) %><%= option.key %>
+                  </li>
+              <% end %>
+            </ul>
           </div>
         </li>
     <% end %>
@@ -232,11 +244,13 @@
           <br>
 
           <div class="ans_field_mcq">
-            <% qn.options.each do |option| %>
-                <p>
-                  <input type="text" name="<%= qn.id %>" id="<%= option.id %>">
-                </p>
-            <% end %>
+            <ul>
+              <% qn.options.each do |option| %>
+                  <li>
+                    <input type="text" name="<%= qn.id %>" id="<%= option.id %>">
+                  </li>
+              <% end %>
+            </ul>
           </div>
         </li>
     <% end %>
@@ -255,7 +269,7 @@
           <br>
 
           <div class="ans_field_mcq">
-            <textarea name="<%= qn.id %>"></textarea>
+            <textarea name="<%= qn.id %>" ></textarea>
           </div>
         </li>
     <% end %>
@@ -288,8 +302,7 @@
     <% @html_code.each_with_index do |qn, index| %>
         <li>
           <div class="srno_field"><%= index + 1 %></div>
-          <div class="que_field_html"><%= qn.cipher %>
-            <br><br>
+          <div class="que_field_html"><%= qn.cipher %><br><br>
             <img src="<%= qn.img.url %>">
           </div>
           <br>

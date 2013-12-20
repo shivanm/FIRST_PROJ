@@ -2,7 +2,7 @@ class TestResultsController < ApplicationController
   # GET /test_results
   # GET /test_results.json
   def index
-    @test_results = TestResult.all
+    @test_results = TestResult.find_all_by_user_id(current_user.id)
 
     respond_to do |format|
       format.html # index.html.erb
