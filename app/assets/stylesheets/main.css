@@ -28,6 +28,11 @@ body {
     font-size: 30px;
 }
 
+.name_div {
+    color: white;
+    text-align: center;
+}
+
 .blue_button {
     background-color: #2283C5;
     text-align: center;
@@ -110,7 +115,7 @@ input[type='text'], input[type='email'], input[type='password'] {
     top: 100%;
     background-color: #D9D9D9;
     border-top: 3px solid #438EB9;
-    margin-top: 6%;
+    margin-top: 2%;
     float: left;
     font-size: 16px;
     color: #333;
@@ -134,7 +139,6 @@ a {
 }
 
 #container {
-    /*border: 1px solid;*/
     padding: 20px;
     position: absolute;
     top: 72px;

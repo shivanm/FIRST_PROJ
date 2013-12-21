@@ -66,7 +66,7 @@
   <div id='counter'>
 
   </div>
-  <div class="name_div"><h3>Hi, Nikunj Thakkar </h3></div>
+  <div class="name_div"><h3>Hi, <%= current_user.name %> </h3></div>
 
 </div>
 <form method="post" action="/test_submit">
@@ -128,6 +128,7 @@
       ];
       var piechart=new Chart(ctx).Pie(data);
   </script>
+  <canvas id="myChart" width="400" height="400"></canvas>
   <ol id='fill'>
     <% @fill_in_the_blank.each_with_index do |fill, index| %>
         <li>

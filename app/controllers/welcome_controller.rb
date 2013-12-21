@@ -91,13 +91,3 @@ class WelcomeController < ApplicationController
   end
 
 end
-
-#class SetObj
-#  def self.insert_obj(obj, user_id)
-#    return_str = []
-#    obj.each do |obj|
-#      return_str << {question_id: obj.id, user_id: user_id}
-#    end
-#    return return_str
-#  end
-#end

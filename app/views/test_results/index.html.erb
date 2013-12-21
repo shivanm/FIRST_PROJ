@@ -65,7 +65,7 @@
           <td><%= test_result.obj_score %></td>
           <td><%= test_result.sub_score %></td>
           <td><%= test_result.total_score %></td>
-          <td><%= link_to 'View Details', '#' %></td>
+          <td><%= link_to 'View Details', show_test_result_path(test_result.id) %></td>
         </tr>
     <% end %>
     </tbody>

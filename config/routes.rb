@@ -19,7 +19,7 @@ Ittest::Application.routes.draw do
   post '/importing_questions' => "questions#import", :as => :importing_questions
   match '/test' => 'welcome#test', as: :test
   match '/test_submit' => 'test_details#test_submit', as: :test_submit
-  match '/show_results' => 'test_details#show_details'
+  match '/show_results/:test_id' => 'test_details#show_details', as: :show_test_result
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

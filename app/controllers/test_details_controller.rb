@@ -93,7 +93,6 @@ class TestDetailsController < ApplicationController
 
     #render json: received_params.first[1].size
     #return
-    final_ans = ''
     final_score = 0
 
     @test = TestResult.create(user_id: current_user.id)
@@ -105,7 +104,7 @@ class TestDetailsController < ApplicationController
         @test.test_details.create(question_id: @question.id, answer: ans, user_id: current_user.id, score: 0)
       else
         ans = param[1]
-        puts '======== >> ' + ans.to_s
+        final_ans = ''
         score = 0
         if (@question.type == 'FillInTheBlank' || @question.type == 'Rearrange')
           ans = ans.strip
@@ -140,7 +139,22 @@ class TestDetailsController < ApplicationController
   end
 
   def submit
+  end
 
+  def show_details
+    test_id = params[:test_id]
+    @test_details = TestDetail.find_all_by_test_result_id(test_id)
+    @question_ids = @test_details.map { |td| td.id}]}
+    @fill_in_the_blank = Question.where(type: 'FillInTheBlank').where(['id IN (?)', @question_ids])
+    render json:@fill_in_the_blank
+    return
+    @true_false = Question.where(type: 'TrueFalse').where(['id IN (?)', @question_ids])
+
+    @mcq1 = Question.where(type: 'Mcq1').where(['id IN (?)', @test_details.map { |td| td.id}])
+    @mcq2 = Question.where(type: 'Mcq2').where(['id IN (?)', @test_details.map { |td| td.id}])
+    @mcq3 = Question.where(type: 'Mcq3').where(['id IN (?)', @test_details.map { |td| td.id}])
+    @rearrange = Question.where(type: 'Rearrange').where(['id IN (?)', @test_details.map { |td| td.id}])
+    #@fill_in_the_blank = Question.where(type: 'FillInTheBlank').where(['id IN (?)', @test_details.map { |td| td.id}])
   end
 
 end
