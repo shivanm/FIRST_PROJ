@@ -1,4 +1,7 @@
 Ittest::Application.routes.draw do
+  resources :questionwise_marks_distributions
+
+
   resources :options
   resources :questions
   resources :test_details

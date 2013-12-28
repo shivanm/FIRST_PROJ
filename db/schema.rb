@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131027170314) do
+ActiveRecord::Schema.define(:version => 20131222133332) do
 
   create_table "chapters", :force => true do |t|
     t.string   "name"
@@ -41,6 +41,13 @@ ActiveRecord::Schema.define(:version => 20131027170314) do
     t.datetime "updated_at",       :null => false
   end
 
+  create_table "questionwise_marks_distributions", :force => true do |t|
+    t.string   "question_type"
+    t.integer  "weightage"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
   create_table "rails_admin_histories", :force => true do |t|
     t.text     "message"
     t.string   "username"
@@ -57,6 +64,7 @@ ActiveRecord::Schema.define(:version => 20131027170314) do
   create_table "test_details", :force => true do |t|
     t.integer  "test_result_id",                 :null => false
     t.integer  "question_id",                    :null => false
+    t.string   "question_type"
     t.text     "answer",         :default => "", :null => false
     t.integer  "score",          :default => 0,  :null => false
     t.integer  "user_id"
@@ -65,12 +73,10 @@ ActiveRecord::Schema.define(:version => 20131027170314) do
   end
 
   create_table "test_results", :force => true do |t|
-    t.integer  "user_id",                    :null => false
-    t.integer  "obj_score",   :default => 0
-    t.integer  "sub_score",   :default => 0
-    t.integer  "total_score"
-    t.datetime "created_at",                 :null => false
-    t.datetime "updated_at",                 :null => false
+    t.integer  "user_id",                   :null => false
+    t.integer  "obj_score",  :default => 0
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
   end
 
   create_table "users", :force => true do |t|

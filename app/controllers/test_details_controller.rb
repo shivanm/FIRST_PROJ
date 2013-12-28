@@ -91,7 +91,7 @@ class TestDetailsController < ApplicationController
     received_params.delete(:controller)
     received_params.delete(:action)
 
-    #render json: received_params.first[1].size
+    #render json: received_params
     #return
     final_score = 0
 
@@ -99,37 +99,44 @@ class TestDetailsController < ApplicationController
 
     received_params.each do |param|
       @question = Question.find (param[0])
-      if ((param[1] === '' || param[1] === 'None') && param[1].size > 1)
+      #puts '====>> ' + (param[1].nil? || param[1] === '').to_s
+      if (param[1].nil? || param[1] === '' || param[1] === 'None')
         ans='Not Attempted'
-        @test.test_details.create(question_id: @question.id, answer: ans, user_id: current_user.id, score: 0)
+        @test.test_details.create(question_id: @question.id, answer: ans, user_id: current_user.id, question_type: @question.type, score: 0)
       else
         ans = param[1]
         final_ans = ''
         score = 0
-        if (@question.type == 'FillInTheBlank' || @question.type == 'Rearrange')
+        if (@question.type === 'FillInTheBlank' || @question.type === 'Rearrange')
           ans = ans.strip
           @option = Option.where(question_id: param[0])
           @option.each do |option|
             (option.key.casecmp(ans) == 0) ? score = @question.options.first.val : score = 0
           end
           final_score += score
-          @test.test_details.create(question_id: @question.id, answer: ans, user_id: current_user.id, score: score)
-        elsif (@question.type == 'TrueFalse' || @question.type == 'Mcq1')
+          @test.test_details.create(question_id: @question.id, answer: ans, user_id: current_user.id, question_type: @question.type, score: score)
+        elsif (@question.type === 'TrueFalse' || @question.type === 'Mcq1')
           score = ans.split('_')[1].to_i
           final_score += score
-          @test.test_details.create(question_id: @question.id, answer: ans.split('_')[0], user_id: current_user.id, score: score)
-        elsif (@question.type == 'Mcq2' || @question.type == 'Mcq3')
-          ans.each do |answer|
-            if (answer != 'None')
-              @option = Option.find(answer.to_i)
-              final_ans += @option.key + '||'
-              score += @option.val
+          puts '======>>' + @question.type
+          @test.test_details.create(question_id: @question.id, answer: ans.split('_')[0], user_id: current_user.id, question_type: @question.type, score: score)
+        elsif (@question.type === 'Mcq2' || @question.type === 'Mcq3')
+          if param[1].size < 2
+            final_ans = 'Not Attempted'
+            score = 0
+          else
+            ans.each do |answer|
+              if (answer != 'None')
+                @option = Option.find(answer.to_i)
+                final_ans += @option.key + '||'
+                score += @option.val
+              end
             end
           end
           final_score += score
-          @test.test_details.create(question_id: @question.id, answer: final_ans, user_id: current_user.id, score: score)
+          @test.test_details.create(question_id: @question.id, answer: final_ans, user_id: current_user.id, question_type: @question.type, score: score)
         else
-          @test.test_details.create(question_id: @question.id, answer: ans, user_id: current_user.id)
+          @test.test_details.create(question_id: @question.id, answer: ans, user_id: current_user.id, question_type: @question.type)
         end
       end
     end
@@ -144,17 +151,33 @@ class TestDetailsController < ApplicationController
   def show_details
     test_id = params[:test_id]
     @test_details = TestDetail.find_all_by_test_result_id(test_id)
-    @question_ids = @test_details.map { |td| td.id}]}
-    @fill_in_the_blank = Question.where(type: 'FillInTheBlank').where(['id IN (?)', @question_ids])
-    render json:@fill_in_the_blank
-    return
-    @true_false = Question.where(type: 'TrueFalse').where(['id IN (?)', @question_ids])
+    @question_ids = @test_details.map { |td| td.question_id }
+    @fill_in_the_blank = Question.where(['id IN (?) AND type = (?)', @question_ids, 'FillInTheBlank'])
+    @true_false = Question.where(['id IN (?) AND type = (?)', @question_ids, 'TrueFalse'])
+    @mcq1 = Question.where(['id IN (?) AND type = (?)', @question_ids, 'Mcq1'])
+    @mcq2 = Question.where(['id IN (?) AND type = (?)', @question_ids, 'Mcq2'])
+    @mcq3 = Question.where(['id IN (?) AND type = (?)', @question_ids, 'Mcq3'])
+    @rearrange = Question.where(['id IN (?) AND type = (?)', @question_ids, 'Rearrange'])
 
-    @mcq1 = Question.where(type: 'Mcq1').where(['id IN (?)', @test_details.map { |td| td.id}])
-    @mcq2 = Question.where(type: 'Mcq2').where(['id IN (?)', @test_details.map { |td| td.id}])
-    @mcq3 = Question.where(type: 'Mcq3').where(['id IN (?)', @test_details.map { |td| td.id}])
-    @rearrange = Question.where(type: 'Rearrange').where(['id IN (?)', @test_details.map { |td| td.id}])
-    #@fill_in_the_blank = Question.where(type: 'FillInTheBlank').where(['id IN (?)', @test_details.map { |td| td.id}])
+    @questionwise_score = TestDetail.group(:question_type, :test_result_id).having(test_result_id: test_id).sum(:score)
+
+    @questionwise_score.each do |qscore|
+      case qscore[0][0]
+        when 'FillInTheBlank'
+          @fill_score = qscore[1].to_i
+        when 'TrueFalse'
+          @tf_score = qscore[1].to_i
+        when 'Mcq1'
+          @mcq1_score = qscore[1].to_i
+        when 'Mcq2'
+          @mcq2_score = qscore[1].to_i
+        when 'Mcq3'
+          @mcq3_score = qscore[1].to_i
+        when 'Rearrange'
+          @rearrange_score = qscore[1].to_i
+      end
+    end
+
   end
 
 end

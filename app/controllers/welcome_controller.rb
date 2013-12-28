@@ -39,7 +39,7 @@ class WelcomeController < ApplicationController
       @true_false = Question.find_by_sql("select * from (SELECT *, row_number() over (partition by chapter_id order by random()) FROM questions where questions.type = 'TrueFalse') a where row_number=1;").sample(6)
       @true_false_next = Question.where(type: 'TrueFalse').where(['id NOT IN (?)', @true_false.map { |q| q.id }]).order('RANDOM()').limit(4).sample(4)
 
-      @mcq1 = Question.find_by_sql("select * from (SELECT *, row_number() over (partition by chapter_id order by random()) FROM questions where questions.type = 'Mcq1' limit 18) a where row_number between 1 AND 3;").sample(18)
+      @mcq1 = Question.find_by_sql("select * from (SELECT *, row_number() over (partition by chapter_id order by random()) FROM questions where questions.type = 'Mcq1') a where row_number between 1 AND 3;").sample(18)
       @mcq1_next = Question.where(type: 'Mcq1').where(['id NOT IN (?)', @mcq1.map { |q| q.id }]).order('RANDOM()').limit(2).sample(2)
 
       @mcq2 = Question.where(type: 'Mcq2').order('RANDOM()').limit(5)

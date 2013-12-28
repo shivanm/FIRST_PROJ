@@ -139,14 +139,14 @@
           <br>
 
           <div class="ans_field_mcq">
+            <p class='hide'>
+              <input type="radio" name="<%= qn.id %>" value="None" checked="true">
+            </p>
               <% qn.options.each do |option| %>
                   <p>
                     <input type="radio" name="<%= qn.id %>" value="<%= option.key %>_<%= option.val %>"><%= option.key %>
                   </p>
               <% end %>
-              <p class='hide'>
-                <input type="radio" name="<%= qn.id %>" value="None" checked="true">
-              </p>
           </div>
         </li>
     <% end %>
@@ -158,14 +158,14 @@
           <br>
 
           <div class="ans_field_mcq">
+            <p class='hide'>
+              <input type="radio" name="<%= qn.id %>" value="None" checked="true">
+            </p>
             <% qn.options.each do |option| %>
                 <p>
                   <input type="radio" name="<%= qn.id %>" id="<%= option.id %>" value="<%= option.key %>_<%= option.val %>"><%= option.key %>
                 </p>
             <% end %>
-            <p class='hide'>
-              <input type="radio" name="<%= qn.id %>" value="None" checked="true">
-            </p>
           </div>
         </li>
     <% end %>
