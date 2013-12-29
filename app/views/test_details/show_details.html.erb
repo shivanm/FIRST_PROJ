@@ -47,7 +47,8 @@
 
   <div class='stats'>
     <canvas id="q1_canvas" width="200" height="200"></canvas>
-    <h2>In Question 1,<br><br> You got <span class='correct'><%= @fill_score %></span> marks. You lost <span class='wrong'><%= 10 - @fill_score %></span>
+    <h2>In Question 1,<br><br> You got <span class='correct'><%= @fill_score %></span> marks. You lost
+      <span class='wrong'><%= 10 - @fill_score %></span>
       marks</h2>
   </div>
 
@@ -82,7 +83,8 @@
 
   <div class='stats'>
     <canvas id="q2_canvas" width="200" height="200"></canvas>
-    <h2>In Question 2,<br><br> You got <span class='correct'><%= @tf_score %></span> marks. You lost <span class='wrong'><%= 10 - @tf_score %></span>
+    <h2>In Question 2,<br><br> You got <span class='correct'><%= @tf_score %></span> marks. You lost
+      <span class='wrong'><%= 10 - @tf_score %></span>
       marks</h2>
   </div>
   <ol class="test_question" id='TF'>
@@ -123,7 +125,8 @@
 
   <div class='stats'>
     <canvas id="q3_canvas" width="200" height="200"></canvas>
-    <h2>In Question 3,<br><br> You got <span class='correct'><%= @mcq1_score %></span> marks. You lost <span class='wrong'><%= 20 - @mcq1_score %></span>
+    <h2>In Question 3,<br><br> You got <span class='correct'><%= @mcq1_score %></span> marks. You lost
+      <span class='wrong'><%= 20 - @mcq1_score %></span>
       marks</h2>
   </div>
   <ol class="mcq test_question">
@@ -166,14 +169,15 @@
 
   <div class='stats'>
     <canvas id="q4_canvas" width="200" height="200"></canvas>
-    <h2>In Question 4,<br><br> You got <span class='correct'><%= @mcq2_score %></span> marks. You lost <span class='wrong'><%= 10 - @mcq2_score %></span>
+    <h2>In Question 4,<br><br> You got <span class='correct'><%= @mcq2_score %></span> marks. You lost
+      <span class='wrong'><%= 10 - @mcq2_score %></span>
       marks</h2>
   </div>
   <ol class="mcq test_question">
     <% @mcq2.each_with_index do |qn, index| %>
         <% test_detail_obj = qn.test_details.where(user_id: current_user.id).first %>
         <% class_to_assign = 'correct_ans' %>
-        <% correct_ans = '' %>
+        <% correct_ans = [] %>
         <% if (test_detail_obj.score == 1) %>
             <% class_to_assign = 'partial_ans' %>
         <% elsif  (test_detail_obj.score == 0) %>
@@ -194,8 +198,18 @@
                       <%= check_box_tag(qn.id.to_s + '[]', option.id, checked = false, options = {disabled: 'disabled'}) %><%= option.key %>
                   <% end %>
                 </p>
+                <% if option.val == 1 %>
+                    <% correct_ans << option.key %>
+                <% end %>
             <% end %>
           </div>
+          <% if class_to_assign != 'correct_ans' %>
+              <p class="correct_ans_label">Correct Ans:&nbsp;&nbsp;&nbsp;
+                <% correct_ans.each do |ans| %>
+                    <%= (correct_ans.last === ans)? ans: (ans + ',  ') %>
+                <% end %>
+              </p>
+          <% end %>
         </li>
     <% end %>
   </ol>
@@ -207,17 +221,19 @@
 
   <div class='stats'>
     <canvas id="q5_canvas" width="200" height="200"></canvas>
-    <h2>In Question 5,<br><br> You got <span class='correct'><%= @mcq3_score %></span> marks. You lost <span class='wrong'><%= 6 - @mcq3_score %></span>
+    <h2>In Question 5,<br><br> You got <span class='correct'><%= @mcq3_score %></span> marks. You lost
+      <span class='wrong'><%= 6 - @mcq3_score %></span>
       marks</h2>
   </div>
   <ol class="mcq test_question">
     <% @mcq3.each_with_index do |qn, index| %>
         <% test_detail_obj = qn.test_details.where(user_id: current_user.id).first %>
-        <% class_to_assign = 'partial_ans' %>
-        <% if (test_detail_obj.score == 3) %>
-            <% class_to_assign = 'correct_ans' %>
-        <% elsif  (test_detail_obj.score == 0) %>
+        <% class_to_assign = 'correct_ans' %>
+        <% correct_ans = [] %>
+        <% if (test_detail_obj.score == 0) %>
             <% class_to_assign = 'wrong_ans' %>
+        <% elsif  (test_detail_obj.score < 3) %>
+            <% class_to_assign = 'partial_ans' %>
         <% end %>
         <li class="<%= class_to_assign %>">
           <div class="srno_field"><%= index + 1 %></div>
@@ -233,8 +249,18 @@
                       <%= check_box_tag(qn.id.to_s + '[]', option.id, checked = false, options = {disabled: 'disabled'}) %><%= option.key %>
                   <% end %>
                 </p>
+                <% if option.val == 1 %>
+                    <% correct_ans << option.key %>
+                <% end %>
             <% end %>
           </div>
+          <% if class_to_assign != 'correct_ans' %>
+              <p class="correct_ans_label">Correct Ans:&nbsp;&nbsp;&nbsp;
+                <% correct_ans.each do |ans| %>
+                    <%= (correct_ans.last === ans)? ans: (ans + ',  ') %>
+                <% end %>
+              </p>
+          <% end %>
         </li>
     <% end %>
   </ol>
@@ -246,15 +272,18 @@
 
   <div class='stats'>
     <canvas id="q6_canvas" width="200" height="200"></canvas>
-    <h2>In Question 6,<br><br> You got <span class='correct'><%= @rearrange_score %></span> marks. You lost `<span class='wrong'><%= 4 - @rearrange_score %></span>
+    <h2>In Question 6,<br><br> You got <span class='correct'><%= @rearrange_score %></span> marks. You lost
+      `<span class='wrong'><%= 4 - @rearrange_score %></span>
       marks</h2>
   </div>
   <ol class="mcq test_question">
     <% @rearrange.each_with_index do |qn, index| %>
         <% test_detail_obj = qn.test_details.where(user_id: current_user.id).first %>
-        <% class_to_assign = 'wrong_ans' %>
-        <% if (test_detail_obj.score == 1) %>
-            <% class_to_assign = 'correct_ans' %>
+        <% class_to_assign = 'correct_ans' %>
+        <% correct_ans = '' %>
+        <% if (test_detail_obj.score == 0) %>
+            <% class_to_assign = 'wrong_ans' %>
+            <% correct_ans=qn.options.first.key %>
         <% end %>
         <li class="<%= class_to_assign %>">
           <div class="srno_field"><%= index + 1 %></div>
@@ -269,6 +298,9 @@
                 </p>
             <% end %>
           </div>
+          <% if correct_ans != '' %>
+              <p class="correct_ans_label">Correct Ans:&nbsp;&nbsp;&nbsp;<%= correct_ans %></p>
+          <% end %>
         </li>
     <% end %>
   </ol>
