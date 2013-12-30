@@ -90,4 +90,54 @@ class WelcomeController < ApplicationController
     redirect_to '/admin'
   end
 
+  #def progress_report
+  #  @user_test_ids = TestResult.select('id').where(user_id: current_user.id)
+  #
+  #  @questionwise_score = TestDetail.where(['test_result_id in (?)', @user_test_ids.map{|test| test.id}]).group(:question_type, :test_result_id).sum(:score)
+  #
+  #  render json: @questionwise_score
+  #  return
+  #
+  #  @final_hash = []
+  #
+  #  @fill_score = []
+  #  @tf_score = []
+  #  @mcq1_score = []
+  #  @mcq2_score = []
+  #  @mcq3_score = []
+  #  @rearrange_score =[]
+  #
+  #  #@final_hash = @final_hash.push(@user_test_ids.map{|test| {test.id => ''}}).first.first
+  #  #@final_hash.push({'a' => 1})
+  #  @questionwise_score.each do |qscore|
+  #    #@user_test_ids.each do |test|
+  #        @final_hash.push(qscore[0][1] => [qscore[0][0], qscore[1]])
+  #    #end
+  #    #case qscore[0][0]
+  #    #  when 'FillInTheBlank'
+  #    #    @fill_score.push(qscore[0][1] => qscore[1])
+  #    #  when 'TrueFalse'
+  #    #    @tf_score.push(qscore[0][1] => qscore[1])
+  #    #  when 'Mcq1'
+  #    #    @mcq1_score.push(qscore[0][1] => qscore[1])
+  #    #  when 'Mcq2'
+  #    #    @mcq2_score.push(qscore[0][1] => qscore[1])
+  #    #  when 'Mcq3'
+  #    #    @mcq3_score.push(qscore[0][1] => qscore[1])
+  #    #  when 'Rearrange'
+  #    #    @rearrange_score.push(qscore[0][1] => qscore[1])
+  #    #end
+  #  end
+  #
+  #  #@final_hash.push(@fill_score, @tf_score, @mcq1_score, @mcq2_score, @mcq3_score, @rearrange_score)
+  #
+  #  #puts '===== >> each element ' + @final_hash[0].first.to_s
+  #  #puts '===== >> test id ' + @final_hash[0].first[0].to_s
+  #  #puts '===== >> q type ' + @final_hash[0].first[1][0].to_s
+  #  #puts '===== >> score ' + @final_hash[0].first[1][1].to_s
+  #  #render json: @final_hash[0].first[1]
+  #  #return
+  #
+  #end
+
 end

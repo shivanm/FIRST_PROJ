@@ -7,6 +7,7 @@ Ittest::Application.routes.draw do
   resources :test_details
   resources :test_results
   resources :chapters
+  resources :progress_report_users
   devise_for :users
 
   #match 'auth/:provider/callback', to: 'sessions#create'

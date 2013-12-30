@@ -35,6 +35,8 @@ function set_counter() {
         $(".submit_btn").click();
     else
         $('#counter').text(leftPad(hours, 2) + ':' + leftPad(min, 2) + ':' + leftPad(sec, 2));
+
+    $('#time_taken').val($('#counter').text())
 }
 function leftPad(number, targetLength) {
     var output = number + '';

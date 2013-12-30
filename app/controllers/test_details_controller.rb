@@ -91,11 +91,14 @@ class TestDetailsController < ApplicationController
     received_params.delete(:controller)
     received_params.delete(:action)
 
-    #render json: received_params
-    #return
+    time = received_params['time_taken'].split(':')
+    time_taken = '' + (2 - time[0].to_i).to_s + ':' + (30 - time[1].to_i).to_s + ':' + (60 - time[2].to_i).to_s
+
+    received_params.delete(:time_taken)
+
     final_score = 0
 
-    @test = TestResult.create(user_id: current_user.id)
+    @test = TestResult.create(user_id: current_user.id, test_time: time_taken)
 
     received_params.each do |param|
       @question = Question.find (param[0])

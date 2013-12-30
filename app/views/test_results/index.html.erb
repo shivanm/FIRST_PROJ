@@ -49,7 +49,8 @@
     <tr>
       <th>Test No</th>
       <th>Test Date</th>
-      <th>Objective score</th>
+      <th>Time Taken</th>
+      <th>Objective score/Out of</th>
       <th>Links</th>
       <th>Overall Performance</th>
     </tr>
@@ -58,20 +59,24 @@
     <% @test_results.each_with_index do |test_result, index| %>
         <tr>
           <td><%= index + 1 %></td>
-          <td><%= test_result.created_at %></td>
-          <td><%= test_result.obj_score %></td>
+          <td><%= test_result.created_at.to_date %></td>
+          <td>
+            <% time = test_result.test_time.split(':') %>
+            <%= time[0] + ' hours : ' + time[1] + ' minutes : ' + time[2] + ' sec' %>
+          </td>
+          <td style="font-size: 2em;"><%= test_result.obj_score %>/60</td>
           <td><%= link_to 'View Details', show_test_result_path(test_result.id) %></td>
-          <td><canvas id="canvas_<%= index + 1 %>" height="100" width="100"></canvas></td>
+          <td><canvas id="canvas_<%= index + 1 %>" height="100" width="100"></canvas><span style="font-size: 2em; color: #69D2E7"><%= (test_result.obj_score*100/60).to_s + '%' %> </span></td>
         </tr>
         <script>
             var data = [
                 {
-                    value: <%= (index+1)*2+10 %>,
+                    value: <%= test_result.obj_score %>,
                     color: "#69D2E7"
 
                 },
                 {
-                    value: <%=(index+1)*2+5 %>,
+                    value: <%= 60 - test_result.obj_score %>,
                     color: "#F38630"
                 }
             ];

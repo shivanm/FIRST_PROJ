@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131222133332) do
+ActiveRecord::Schema.define(:version => 20131230060651) do
 
   create_table "chapters", :force => true do |t|
     t.string   "name"
@@ -26,6 +26,23 @@ ActiveRecord::Schema.define(:version => 20131222133332) do
     t.integer  "question_id"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
+  end
+
+  create_table "progress_report_users", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "test_result_id"
+    t.string  "fill"
+    t.integer "fill_score"
+    t.string  "tf"
+    t.integer "tf_score"
+    t.string  "mcq1"
+    t.integer "mcq1_score"
+    t.string  "mcq2"
+    t.integer "mcq2_score"
+    t.string  "mcq3"
+    t.integer "mcq3_score"
+    t.string  "rearrange"
+    t.integer "rearrange_score"
   end
 
   create_table "questions", :force => true do |t|
@@ -75,6 +92,7 @@ ActiveRecord::Schema.define(:version => 20131222133332) do
   create_table "test_results", :force => true do |t|
     t.integer  "user_id",                   :null => false
     t.integer  "obj_score",  :default => 0
+    t.string   "test_time"
     t.datetime "created_at",                :null => false
     t.datetime "updated_at",                :null => false
   end
