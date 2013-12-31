@@ -3,6 +3,13 @@ class ProgressReportUsersController < ApplicationController
   # GET /progress_report_users.json
   def index
     @progress_report_users = ProgressReportUser.where(user_id: current_user.id).order('test_result_id desc limit 3')
+    #@test_time = []
+    #@progress_report_users.each do |rep|
+    #  @test_time.push(TestResult.find(rep.test_result_id).test_time)
+    #end
+
+    #render json: @test_time
+    #return
     key_array = ['fill_score', 'tf_score', 'mcq1_score', 'mcq2_score', 'mcq3_score', 'rearrange_score']
     @final_hash = []
     @progress_report_users.each do |report|

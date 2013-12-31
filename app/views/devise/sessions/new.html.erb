@@ -1,7 +1,16 @@
+<script type="text/javascript">
+  $(function(){
+     if($('.instruction_note').text() === ''){
+         $('.instruction_note').css('padding', 0)
+     }
+  });
+
+</script>
+
 <div id='top_bar'>
-  <div id='logo'>
+  <a href="/" id='logo'>
     Let.Me.Practice.
-  </div>
+  </a>
   <div id="contact_us_btn" class="light_button">Contact Us</div>
 </div>
 <div id='container'>
@@ -35,7 +44,7 @@
   <div id=login_panel>
 
     <h4 class="lighter bigger header">Sign-in</h4>
-
+    <p class="instruction_note" style="display: block" id="alert"><%= alert %></p>
     <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
         <div class="fields">
           <%= f.email_field :email, :autofocus => true, placeholder: "Your Email" %>
@@ -45,15 +54,14 @@
           <%= f.submit "Sign in", class: "blue_button", id: "login_btn" %>
           <%= link_to "Not Registered? Sign Up", new_registration_path(resource_name), id: "sign_up_btn", class: "red_button" %>
           <br/>
-          <%= link_to "Sign In as Guest", '/create_guest', id: "guest_signin_btn", class: "green_button" %>
-          <br/>
+          <%#= link_to "Sign In as Guest", '/create_guest', id: "guest_signin_btn", class: "green_button" %>
         </div>
     <% end %>
 
   </div>
   <div id='footer_panel'>
     <div id='copyright'>All Rights Reserved. 2013 <span class="copy_sym">&copy;</span>
-      <a target="_new" href='http://www.yuvabeat.com'><span class="Y YB_logo">Yuva</span><span class="B YB_logo">Beat</span></a>
+      <a href='#'><span class="Y YB_logo">Yuva</span><span class="B YB_logo">Beat</span></a>
     </div>
   </div>
 </div>

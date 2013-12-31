@@ -26,6 +26,7 @@
     $(function () {
         var test_format = [10, 10, 20, 10, 6, 4];
         var question_keys = ["Fill in the blanks", "True False", "MCQ1", "MCQ2", "MCQ3", "Rearrange"];
+        var colors_array = ['#A0408B', '#69D2E7', '#275AA2', '#158875', '#0E6892', '#4D5360']
         var score_array = <%= @final_hash %>
 
         var toAppend_head = "<tr>";
@@ -54,11 +55,11 @@
                     },
                     {
                         value: score_array[que_index],
-                        color: "#69D2E7"
+                        color: colors_array[row_count]
                     }
                 ];
                 canvas_name = "canvas_" + question_keys[row_count] + "_" + index;
-                toAppend = "<td><canvas id=\"" + canvas_name + "\" height=\"60\" width=\"60\"></canvas></td>";
+                toAppend = "<td><canvas id=\"" + canvas_name + "\" height=\"75\" width=\"75\"></canvas><span style='font-size: 1.5em; top: -30px; padding-left: 20px; position: relative;'>" + score_array[que_index] + "/" + test_format[row_count] + "</td>";
                 $('#row_' + row_count).append(toAppend);
                 var myPie = new Chart(document.getElementById(canvas_name).getContext("2d")).Pie(pieData);
                 toAppend = "</tr>";
@@ -70,52 +71,26 @@
             }
             loop_count += 1;
         }
-
-//        for (var que_index = 0; que_index < question_keys.length; que_index++) {
-//            toAppend = '<tr id="row_' + que_index + '">';
-//            toAppend += "<td>" + question_keys[que_index] + "</td></tr>";
-//            $('table#progress_report_table tbody').append(toAppend);
-//            for (var index = 1; index <= <#%= @questionwise_score.size %>; index++) {
-//                var pieData = [
-//                    {
-//                        value: 30,
-//                        color: "#F38630"
-//                    },
-//                    {
-//                        value: 100,
-//                        color: "#69D2E7"
-//                    }
-//
-//                ];
-//                canvas_name = "canvas_" + question_keys[que_index] + "_" + index;
-//                toAppend = "<td><canvas id=\"" + canvas_name + "\" height=\"75\" width=\"75\"></canvas></td>";
-//                $('#row_' + que_index).append(toAppend);
-//                var myPie = new Chart(document.getElementById(canvas_name).getContext("2d")).Pie(pieData);
-//            }
-//            //                toAppend = "</tr>";
-//            //                $('table#progress_report_table tbody').append(toAppend);
-//        }
-
-
     });
-</script>
-<div id='top_bar'>
-  <div id='logo'>
-    Let.Me.Practice.
-  </div>
-  <%= link_to 'Logout', signout_path, id: "logout_btn", class: "red_button" %>
-  <div id="contact_us_btn" class="light_button">Contact Us</div>
-</div>
-<div id="progress_report_table_container">
-  <table id='progress_report_table' class="table table-striped table-bordered">
-    <thead>
-    </thead>
-    <tbody class="pie_reports">
-    </tbody>
-  </table>
-  <div id='footer_panel'>
-    <div id='copyright'>All Rights Reserved. 2013 <span class="copy_sym">&copy;</span>
-      <a target="_new" href='http://www.yuvabeat.com'><span class="Y YB_logo">Yuva</span><span class="B YB_logo">Beat</span></a>
-    </div>
-  </div>
-</div>
+      </script>
+      <div id='top_bar'>
+        <a href="/" id='logo'>
+          Let.Me.Practice.
+        </a>
+        <%= link_to 'Logout', signout_path, id: "logout_btn", class: "red_button" %>
+        <div id="contact_us_btn" class="light_button">Contact Us</div>
+      </div>
+      <div id="progress_report_table_container">
+        <p class="remarks" style="width: 40%;">The progress report below shows your performance in last 3 tests.</p>
+        <table id='progress_report_table' class="table table-striped table-bordered">
+          <thead>
+          </thead>
+          <tbody class="pie_reports">
+          </tbody>
+        </table>
+        <div id='footer_panel'>
+          <div id='copyright'>All Rights Reserved. 2013 <span class="copy_sym">&copy;</span>
+            <a href='#'><span class="Y YB_logo">Yuva</span><span class="B YB_logo">Beat</span></a>
+          </div>
+        </div>
+      </div>

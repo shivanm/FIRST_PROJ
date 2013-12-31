@@ -5,6 +5,8 @@ class WelcomeController < ApplicationController
   end
 
   def test
+    @test_given = TestResult.find_all_by_user_id(current_user.id).size
+
     @previous_question_set = TestDetail.where(user_id: current_user.id).select(:question_id)
     #render json: @fill_in_the_blank_chapter
     #return

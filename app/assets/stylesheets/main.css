@@ -203,3 +203,34 @@ a {
 .partial_ans{
     border: 3px solid #fff500;
 }
+
+.remarks{
+    padding: 10px;
+    background-color: #87B87F;
+    color: #ffffff;
+}
+
+.instruction_note{
+    background-color: #FEE188;
+    color: #996633;
+    padding: 10px;
+    width: 98%;
+    position: relative;
+    display: none;
+}
+
+.close{
+    position: absolute;
+    right: 0;
+    padding-right: 10px;
+    font-weight: 500;
+    font-size: 1.2em;
+    vertical-align: middle;
+    color: #808080;
+}
+.close:hover{
+    font-weight: bold;
+    font-size: 1.4em;
+    cursor: pointer;
+    color: #996633;
+}

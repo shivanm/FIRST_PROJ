@@ -145,6 +145,26 @@ class TestDetailsController < ApplicationController
     end
 
     @test.update_attribute(:obj_score, final_score)
+
+    @questionwise_score = TestDetail.group(:question_type, :test_result_id).having(test_result_id: @test.id).sum(:score)
+
+    @questionwise_score.each do |qscore|
+      case qscore[0][0]
+        when 'FillInTheBlank'
+          @fill_score = qscore[1].to_i
+        when 'TrueFalse'
+          @tf_score = qscore[1].to_i
+        when 'Mcq1'
+          @mcq1_score = qscore[1].to_i
+        when 'Mcq2'
+          @mcq2_score = qscore[1].to_i
+        when 'Mcq3'
+          @mcq3_score = qscore[1].to_i
+        when 'Rearrange'
+          @rearrange_score = qscore[1].to_i
+      end
+    end
+    ProgressReportUser.create(user_id: current_user.id, test_result_id: @test.id, fill: 'FillInTheBlank', fill_score: @fill_score, tf: 'TrueFalse', tf_score: @tf_score, mcq1: 'Mcq1', mcq1_score: @mcq1_score, mcq2: 'Mcq2', mcq2_score: @mcq2_score, mcq3: 'Mcq3', mcq3_score: @mcq3_score, rearrange: 'Rearrange', rearrange_score: @rearrange_score)
     render action: "submit"
   end
 

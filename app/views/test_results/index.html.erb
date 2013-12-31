@@ -3,12 +3,12 @@
         position: absolute;
         top: 15%;
         width: 100%;
-        padding: 5%;
+        padding: 1%;
         font-family: 'Open Sans';
     }
 
     #test_report {
-        width: 89%;
+        width: 96%;
         color: #707070;
     }
 
@@ -36,23 +36,26 @@
 
 
 <div id='top_bar'>
-  <div id='logo'>
+  <a href="/" id='logo'>
     Let.Me.Practice.
-  </div>
+  </a>
   <%= link_to 'Logout', signout_path, id: "logout_btn", class: "red_button" %>
   <div id="contact_us_btn" class="light_button">Contact Us</div>
 </div>
 
 <div id="test_report_container">
+  <p class='remarks' style="width: 65%;">
+    *Score includes only Objective score. Subjective questions will not be corrected. Check for the guidelines for Subjective Questions.<br>
+    +Click on the chart to view detailed performance
+  </p>
   <table id="test_report" class="table table-striped table-bordered">
     <thead>
     <tr>
       <th>Test No</th>
       <th>Test Date</th>
       <th>Time Taken</th>
-      <th>Objective score/Out of</th>
-      <th>Links</th>
-      <th>Overall Performance</th>
+      <th>Score*</th>
+      <th>Overall Performance<sup>+</sup></th>
     </tr>
     </thead>
     <tbody>
@@ -65,8 +68,7 @@
             <%= time[0] + ' hours : ' + time[1] + ' minutes : ' + time[2] + ' sec' %>
           </td>
           <td style="font-size: 2em;"><%= test_result.obj_score %>/60</td>
-          <td><%= link_to 'View Details', show_test_result_path(test_result.id) %></td>
-          <td><canvas id="canvas_<%= index + 1 %>" height="100" width="100"></canvas><span style="font-size: 2em; color: #69D2E7"><%= (test_result.obj_score*100/60).to_s + '%' %> </span></td>
+          <td><a href="<%= show_test_result_path(test_result.id) %>"><canvas id="canvas_<%= index + 1 %>" height="100" width="100"></canvas><span style="font-size: 2em; color: #69D2E7"><%= (test_result.obj_score*100/60).to_s + '%' %> </span></a></td>
         </tr>
         <script>
             var data = [
