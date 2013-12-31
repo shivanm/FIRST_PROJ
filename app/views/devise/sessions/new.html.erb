@@ -1,8 +1,10 @@
 <script type="text/javascript">
   $(function(){
-     if($('.instruction_note').text() === ''){
+     if($('.instruction_note').text() === 'x '){
          $('.instruction_note').css('padding', 0)
-     }
+         $('.close').hide();
+     }else
+         $('.close').show();
 
       $('.close').on('click', function(){
           $('.instruction_note').hide();
