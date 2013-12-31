@@ -88,4 +88,17 @@
     <% end %>
     </tbody>
   </table>
+  <div id='footer_panel'>
+    <div id='copyright'>All Rights Reserved. 2013 <span class="copy_sym">&copy;</span>
+      <a href='#'><span class="Y YB_logo">Yuva</span><span class="B YB_logo">Beat</span></a>
+    </div>
+  </div>
 </div>
+
+<script type="text/javascript">
+  $(function(){
+      if($('#test_report_container').innerHeight() < 500){
+        $('#footer_panel').css({'position': 'fixed','bottom': '10%'});
+      }
+  });
+</script>
