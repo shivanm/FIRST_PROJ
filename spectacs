@@ -157,7 +157,7 @@ The refactoring of interest module is for 2 types of user:
 1.3	Proposed Solution
 
 
-
+LAYER DIA
  
 
 
@@ -200,7 +200,7 @@ As highlighted in Red colour in the above image, UV2IVNI0WebSrvc and UV2IVNI0ejb
 1.3.1	 Deliverables
 
 
- 
+ FLOW DIAGRAM
 
 
 
@@ -933,7 +933,7 @@ Configuration of PerintsettWriter in perintsett-job.xml:
 Below Example shows the workflow of a transaction with New, Update and Settle steps:
 
 Steps of Transaction	Interest Types	Calculation Method	Rate Type Code	Payment Method
-EP New	Normal
+EP New	                   Normal
 
 Overdue	02 - 360	Fixed	Arrear
 EP Update 				
