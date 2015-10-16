@@ -1,0 +1,2170 @@
+		
+
+
+IVISION PROJECT
+TECHNICAL SPECIFICATIONS
+IVN-18866  - INTEREST MODULE
+
+
+
+
+
+
+
+
+
+
+
+
+Warning: 
+It is of the responsibility of every user to make sure that the version which he uses is up to date.
+
+
+
+Authors	Aditi Bhat
+Proprietary entity	BNP Paribas
+ 
+
+Validation of this current document
+
+Name	Function	Date(DD/MM/YYYY)
+		
+
+Mailing list
+Name	Function	Firm
+		
+		
+
+Versions
+
+Version	Date	Responsible	Type of the modification
+t1.1	05/12/2013	Aditi Bhat	Initial Draft 
+t1.2	27/12/2013	Sushant PAWAR	Review
+1.3	13/2/2014	Sushant PAWAR	Modified Section 3.1.4 for  to describe the computation of interest.
+t1.4	13/03/2014	Aditi Bhat	Added section 1.3.7 Workflow,
+Updated section 31. Parameter setup –added new Parameter P191
+t1.5	13/03/2014	Sushant PAWAR	Review
+t1.6	28/05/2014	Aditi Bhat	Added sections 1.3.8, 1.3.9, 1.3.10, 1.3.11 
+t1.7	30/06/2014	Rahul SHAH	Updated as per latest technical flow
+t1.8	01/07/2014	Aditi Bhat	Updated as per latest technical flow
+t1.9	25/07/2014	Rahul SHAH	Updated section 1.3.5 to include information on the parameters required to run the batches
+
+ 
+TABLE OF CONTENTS
+
+1.	OBJECTIVE OF THE CHANGES	4
+1.1	CURRENT SITUATION	4
+1.2	BUSINESS REQUIREMENT	4
+1.2.1	Functional Description	5
+1.2.2	Technical Description	6
+1.3	PROPOSED SOLUTION	6
+1.3.1	Deliverables	8
+1.3.2	Proposed design of Web Services Client	10
+1.3.3	Proposed design of Web Services	12
+1.3.4	Proposed design of InterestComputation.jar	12
+1.3.5	Proposed design of batches for Interest Proration & Perintsett	20
+1.3.6	Workflow	28
+1.3.7	Example of Presettlement of Interest In Arrears	44
+1.3.8	Example of PerintSett with Monthly Transaction	52
+1.3.9	Example of  Monthly Transaction with Fixed at Maturity/Month end	57
+1.3.10	Migration of live deals to new Interest Module.	62
+2.	IMPACT ANALYSIS	66
+3.	SYSTEM SETUP	70
+3.1	PARAMETER SET UP	70
+3.1.1	Additional information	71
+3.2	RETURN CODES	71
+3.3	TABLE CREATED/UPDATED	72
+3.3.1	Table Created	72
+3.3.2	Tables Updated	72
+4.	TECHNICAL SPECIFICATIONS	73
+4.1	MODIFICATION IN VIEW LAYER	73
+4.2	MODIFICATION IN CONTROLLER LAYER	73
+4.3	MODIFICATION IN MODEL LAYER	73
+4.4	MODIFICATION IN BATCHES	83
+5.	COMMENTS	85
+ 
+
+1.	 Objective of the changes
+1.1	Current Situation
+
+In iVision, the following products are offering an interface to manipulate interest records:
+	TR
+	PC
+	EBN
+	EBP
+
+The interest module is tightly coupled with core iVision and consists of  the below parts:
+	Interest screen – Interest details page
+Consists of Ivision core , Html, Javascript
+	Interest computation – Interest amount computation and statement generation on click of Validate button on Interest details page.
+Consists of Ivision core , Java and PL/SQL.
+The computation and statement generation is done in PL/SQL
+	Interest accruals – Batch with PL/SQL
+	Interest periodic - Batch with PL/SQL
+Any change in the Interests module can impact all these 4 parts and a hotfix or patch  delivery consists  of Ivision core, plsql and batches.
+1.2	Business Requirement
+
+The interest module must take into account:
+	Display and computation of interest directly into transaction
+	Generate accruals
+	Generate periodic interest
+
+The interest module needs to be rewritten as below :
+1.	Existing Interest computation logic and statement generation should be decoupled from Ivision Core.
+2.	The existing batches for proration and settlement, which are in PL/SQL need to be rewritten using Spring Batch framework in Java.
+
+
+
+1.2.1	Functional Description
+
+The refactoring of interest module is for 2 types of user:
+-	Final users: they want to use the module of interest without bug and to have the possibility to upgrade it
+-	Support users: they want to deploy this module simply, with no impact on others modules and to have possibility to do quick hotfix if is needed
+
+ The Interest module must fulfill the below requirements:
+
+1.	Display interest screen normal.
+2.	Display interest screen extend.
+3.	Display interest screen overdue.
+4.	Compute interest during transaction.
+5.	Compute interest during EOD.
+6.	Generate settlements.
+7.	Generate interests RO.
+8.	Generate accruals
+9.	Rate type: fixed rate
+10.	Rate type: floating rate
+11.	Rate type: fixed at maturity
+12.	Method 01 – 365 or 365d/year - real nb of days/month-1
+13.	Method 02 – 360 or 360d/year - real nb of days/month-1
+14.	Method 03 – German or 360d/year - 30d/month -1
+15.	Method 11 – English Inclusive or 365d/year - real nb of days/month
+16.	Method 12 – International Inclusive or 360d/year - real nb of days/month
+17.	Method 13 – German Inclusive or 360d/year - 30d/month
+18.	Deployment with no impact on core
+
+
+
+
+
+
+
+
+
+
+
+
+1.2.2	Technical Description
+1.3	Proposed Solution
+
+
+
+ 
+
+
+
+
+•	In the existing system, the Interest module is tightly coupled with Ivision.
+•	In the proposed solution, the interest module will be separated from Ivision Core.
+
+Modification in Business Layer:
+o	The Interest computation logic will  be implemented as Web Services, namely, IVisionInterest_WebSrvcEAR_INX.X.ear
+o	This web service component will interact with Ivision, through a Web Services Client –IVisionInterest_WebClnt.jar.
+o	PL/SQL to Java for reduction in Complexity
+
+Modification in Database Layer:
+o	The Proration Batches will be implemented in Java, using Spring Batch framework.
+o	PL/SQL to Java for reduction in Complexity
+
+
+
+
+The Web Services ear file will be deployed on a separate container, on the EJB Layer, so that there will be 3 applications deployed as below:
+
+1)	Web Services container- Interest Web Services (deployed on EJB layer)
+2)	EJB container- Ivision Core
+3)	Web container – Ivision Core
+
+ 
+
+
+In the example above, UV2IVNI0 is the server instance name.
+•	UV2IVNI0WebSrvc is the name of the Web services container.
+•	UV2IVNI0ejb is the Ivision Ejb container
+•	UV2IVNI0web is the Ivision Web container
+
+As highlighted in Red colour in the above image, UV2IVNI0WebSrvc and UV2IVNI0ejb are deployed on the same machine, that is, the Hostname and Node are same for both the containers.
+
+
+
+
+1.3.1	 Deliverables
+
+
+ 
+
+
+
+
+There will be separate delivery for the Interest module, comprising of below two deliverables:
+1.	IVisionInterest_WebSrvcEAR_INX.X.ear
+2.	ivn_interest_batches_INX.X.tar.Z
+
+
+
+1.	IVisionInterest_WebSrvcEAR_INX.X.ear
+This component will be deployed on the business layer and internally consists of 2 parts:
+
+I.	IVisionInterest_WebSrvc.war
+
+	The logic in IVisionInterest_WebSrvc.war will get invoked on click of the Validate button on the Interest details page.
+	It will use Web Services, and it will communicate with the Ivision component - IvisionEJB.ear  through a web services client.
+	For the interest computation, it will call the classes present in InterestComputation.jar
+
+II.	InterestComputation.jar
+	This jar will contain the code for computation of Interest and statement generation logic.
+	Common component for both IVisionInterest_WebSrvcEAR_INX.X.ear and ivn_interest_batches_INX.X.tar
+
+
+
+2.	ivn_interest_batches_INX.X.tar
+
+This component will be deployed on the database layer and internally consists of 5 parts:
+
+I.	InterestBatches.jar
+
+	Periodic settlement batch , using Spring batch framework
+	Proration batch, using Spring batch framework
+
+
+II.	SCT
+This will contain the Shell scripts run_interest_perintsett.sct and run_interest_proration.sct, which will invoke the Java batches contained in iVisionInterestBatches.jar
+ 
+III.	InterestComputation.jar
+
+	This jar will contain the code for computation of Interest and statement generation logic.
+	This Component will be reused in IVisionInterest_WebSrvcEAR_INX.X.ear and ivn_interest_batches_INX.X.tar
+
+IV.	IVisionDataObjects.jar
+
+	This jar will contain all iVision related POJO’s which are mapped to database entities.
+V.	IVisionAccounting.jar
+
+	This jar will contain the code for computation of accounting entries logic.
+	This logic is invoked during the monthly settle functionality.
+
+1.3.2	Proposed design of Web Services Client
+
+ On click of Validate button, on the Interest details page, interest computation and statement generation will happen.
+The communication between Ivision EJB and the Web services component, will happen through REST web services client.
+
+•	What is REST ?
+REST stands for Representational State Transfer. (It is sometimes spelled "ReST".) It relies on a stateless, client-server, cacheable communications protocol -- and in virtually all cases, the HTTP protocol is used.
+REST is an architecture style for designing networked applications. The idea is that, rather than using complex mechanisms such as CORBA, RPC or SOAP to connect between machines, simple HTTP is used to make calls between machines.
+RESTful applications use HTTP requests to post data (create and/or update), read data (e.g., make queries), and delete data. Thus, REST uses HTTP for all four CRUD (Create/Read/Update/Delete) operations.
+REST is a lightweight alternative to mechanisms like RPC (Remote Procedure Calls) and Web Services (SOAP, WSDL, et al.).
+Despite being simple, REST is fully-featured; there's basically nothing you can do in Web Services that can't be done with a RESTful architecture.
+•	Following code snippet will be put in the method xmlInterestAmountRetrieval() of GetInterest.java, to make  a REST call to the Web services module.
+
+Following code snippet will be put in the method xmlInterestAmountRetrieval() of GetInterest.java, to make  a REST call to the Web services module.
+
+public static BusinessResponse xmlInterestAmountRetrieval(BusinessRequest brEntry)
+		throws IVisionException {
+
+		XStream xstream = new XStream(new XppDriver(new XmlFriendlyReplacer("$",
+				"_")));
+		userContext.toXML();
+
+// Interest XML string
+		String reqInts = xstream.toXML(interest);
+		System.out.println(reqInts);
+		
+		
+
+// Creating configuration
+DefaultConfig config = new DefaultConfig();
+		
+		IvisionClient client = DefaultClient.create(config);
+		
+
+// Interest XML string
+client.execute(reqInts);
+}
+
+IvisionClient.java
+		public String execute(String input){
+		
+// Making web service call
+
+HttpEntity<String> entity = new HttpEntity<String>(input,config.getHeaders());
+		
+		ResponseEntity<String> respPst = restTemplate.exchange(getUrl(), HttpMethod.POST, entity, String.class);
+		
+/* The URL will be configurable in a properties file
+for eg, the URL will be http://localhost:9081/IVisionInterest_WebSrvc/webService/interest/compute*/
+
+		return respPst.getBody();
+	}
+
+IVisionInterest_WebSrvc:
+This is the Web Services Component
+
+ Here, HttpEntity Represents an HTTP request or response entity, consisting of headers and body.
+The HttpEntity is set with HttpHeaders and the body is set with the Interest xml.
+
+restTemplate.exchange  method: 
+•	Executes the HTTP method to the given URI template, writing the given request entity to the request, and returns the response as ResponseEntity.
+•	This method is used to exchange the interest inputs to Web services and obtain the output.
+		
+1.3.3	Proposed design of Web Services 
+The web service call from Ivision, as explained above, will be an HTTP request, as below:
+
+http://<URL>:<port>/IVisionInterest_WebSrvc/webService/interest/compute
+
+	The call will go to InterestServiceController.java, contained in the web services.
+
+	The class is mapped to /interest and the method computeDetails() is mapped to /compute.
+
+@RequestMapping("/interest")
+@Controller
+public class InterestServiceController {
+
+@RequestMapping(method = RequestMethod.POST,value = "/compute",headers="Accept=*/*")
+
+		public @ResponseBody ModelAndView computeDetails(@RequestBody  Interest reqObj, ModelMap model) {
+		
+		System.out.println(reqObj.getAdvn_pymt_date());
+		
+		Interest respObj = intrestService.computeInterest(reqObj);
+
+		return new ModelAndView("interestdetails", "object", respObj);
+}
+
+
+
+1.3.4	 Proposed design of InterestComputation.jar
+This is a common component for the Model layer and batches
+
+        Class Diagram for Interest Computation :
+
+ 
+
+
+The design pattern used is Strategy pattern.
+
+Here, CalculationMethodStrategy is a strategy and we have multiple implementations of this strategy, based on calculation method: 
+
+1)	Calculation360MethodStrategy.java
+2)	Calculation365MethodStrategy.java
+3)	CalculationEnglishInclusiveMethodStrategy.java
+
+4)	CalculationGermanInclusiveMethodStrategy.java
+5)	CalculationGermanMethodStrategy.java
+6)	CalculationInternationalInclusiveMethodStrategy
+
+The implementation to be called, is decided at runtime, based on the input parameters passed.
+
+Based on different transaction scenarios, the Strategy will be set in the Context.
+And based on the strategy passed, the implementation for that strategy will be called.
+
+	ComputeInterest.java
+
+The calculateInterest() method is called from respective Strategy implementation classes
+Based on strategy implementation n.o of days in year are passed.
+
+Following is the proposed Algorithm based on following formula
+
+Interest amount = principal amount * interest number of days *   
+
+
+public static BigDecimal getInterestAmount(BigDecimal osAmount, int tenor, int daysInAYear, Float intRate )
+	{
+		
+		LOGGER.info(InterestConstant.ENTER+className+".getInterestAmount()");
+		
+		LOGGER.info("OS Amount " + osAmount);
+		LOGGER.info("Tenor " + tenor);
+		LOGGER.info("Days in Year " + daysInAYear);
+		LOGGER.info("IntRate " + intRate);
+		MathContext mc = new MathContext(InterestConstant.CALCULATE_PRECISION,RoundingMode.HALF_UP);
+		LOGGER.info(InterestConstant.EXIT+className+".getInterestAmount");
+		return (osAmount.multiply(new BigDecimal(tenor),mc).multiply(new BigDecimal(intRate),mc)).divide(new BigDecimal(daysInAYear*100),mc);
+		
+		
+		
+	}
+
+ 
+
+
+
+	Calculate.java
+•	The getInterestStrategy() method uses Reflection and returns the appropriate implementation class of CalculationMethodStrategy, based on runtime inputs.
+
+
+
+
+
+	CalculationMethodStrategy.java
+Interface which has the calculateInterest() method
+
+	Calculation360MethodStrategy.java
+•	Implementation of CalculationMethodStrategy interface
+•	Calculates interest using Calculation Method – 360 or 360d/year – real nb of days/month – 1
+
+public BigDecimal calculateInterest(Date startDate, Date endDate,
+			Float intRate, BigDecimal osAmount) {
+		LOGGER.info(InterestConstant.ENTER+className+".calculateInterest()");
+		long diff = Math.abs(endDate.getTime() - startDate.getTime());
+		int tempTenor = (int) (diff / (24 * 60 * 60 * 1000));
+		LOGGER.info(InterestConstant.EXIT+className+".calculateInterest()");
+		String str=ComputeInterest.getInterestAmount(osAmount, tempTenor, 360, intRate).toString();
+		return new BigDecimal(str).setScale(InterestConstant.FINAL_PRECISION, InterestConstant.ROUNDING_MODE);
+		
+	}
+	Calculation365MethodStrategy.java
+
+•	Implementation of CalculationMethodStrategy interface
+•	Calculates interest using Calculation Method – 365 or 365d/year – real nb of days/month – 1
+
+
+public BigDecimal calculateInterest(Date startDate, Date endDate,
+			Float intRate, BigDecimal osAmount) {
+		LOGGER.info(InterestConstant.ENTER+className+".calculateInterest()");
+		@SuppressWarnings("deprecation")
+		int years=endDate.getYear()-startDate.getYear();
+		int noOfDays=365;
+		int tempTenor=InterestConstant.NO_0;
+		BigDecimal intAmount=BigDecimal.ZERO;
+		int count=InterestConstant.NO_0;
+		
+		//Leap Year case
+		if (InterestUtils.isLeapYear(startDate))
+		{
+			noOfDays=366;
+		}
+//Case 1. Start date and end date are in the same year. 
+		if (years==InterestConstant.NO_0)
+		{
+			long diff = Math.abs((endDate).getTime() - startDate.getTime());
+			tempTenor = (int) (diff / (24 * 60 * 60 * 1000));
+			
+			intAmount = ComputeInterest.getInterestAmount(osAmount, tempTenor, noOfDays, intRate);
+			return intAmount.setScale(InterestConstant.FINAL_PRECISION,InterestConstant.ROUNDING_MODE);
+		}
+		// first block of calculation
+		long diff = Math.abs(InterestUtils.getEndOfYear(startDate).getTime() - startDate.getTime());
+		tempTenor = (int) (diff / (24 * 60 * 60 * 1000))+InterestConstant.NO_1;
+		
+		intAmount = ComputeInterest.getInterestAmount(osAmount, tempTenor, noOfDays, intRate);
+		
+		// Middle block of computation
+//Case 2. Start date and end date are not in the same year.
+		if (years>2)// in this case loop for middle cycle will calculate the amount
+		{
+			count=years-2;
+			for (int i=0;i<=count;i++)
+				intAmount=intAmount.add(ComputeInterest.getInterestAmount(osAmount, InterestConstant.NO_1, InterestConstant.NO_1, intRate));
+		}
+		
+		// last block of computation
+		if (InterestUtils.isLeapYear(endDate))
+		{
+			noOfDays=366;
+		}
+		diff = Math.abs(endDate.getTime()-InterestUtils.getStartOfYear(endDate).getTime());
+		tempTenor = (int) (diff / (24 * 60 * 60 * 1000));
+		intAmount=intAmount.add(ComputeInterest.getInterestAmount(osAmount, tempTenor, noOfDays, intRate));
+		
+		LOGGER.info(InterestConstant.EXIT+className+".calculateInterest()");
+		return intAmount.setScale(InterestConstant.FINAL_PRECISION,InterestConstant.ROUNDING_MODE);
+		
+				
+	}
+
+	CalculationEnglishInclusiveMethodStrategy.java
+•	Implementation of CalculationMethodStrategy interface
+•	Calculates interest using Calculation Method –English Inclusive or 365d/year – real nb of days/month
+
+public BigDecimal calculateInterest(Date startDate, Date endDate,
+			Float intRate, BigDecimal osAmount) {
+		LOGGER.info(InterestConstant.ENTER+className+".calculateInterest()");
+		@SuppressWarnings("deprecation")
+		int years=endDate.getYear()-startDate.getYear();
+		int noOfDays=365;
+		int tempTenor=InterestConstant.NO_0;
+		BigDecimal intAmount=BigDecimal.ZERO;
+		int count=InterestConstant.NO_0;
+		
+		
+		if (InterestUtils.isLeapYear(startDate))
+		{
+			noOfDays=366;
+		}
+		
+		
+		if (years==InterestConstant.NO_0)
+		{
+			long diff = Math.abs((endDate).getTime() - startDate.getTime());
+			tempTenor = (int) (diff / (24 * 60 * 60 * 1000))+InterestConstant.NO_1;
+			
+			intAmount = ComputeInterest.getInterestAmount(osAmount, tempTenor, noOfDays, intRate);
+			return intAmount.setScale(InterestConstant.FINAL_PRECISION,InterestConstant.ROUNDING_MODE);
+		}
+		// first block of calculation
+		long diff = Math.abs(InterestUtils.getEndOfYear(startDate).getTime() - startDate.getTime());
+		tempTenor = (int) (diff / (24 * 60 * 60 * 1000))+InterestConstant.NO_1;
+		
+		intAmount = ComputeInterest.getInterestAmount(osAmount, tempTenor, noOfDays, intRate);
+		
+		// Middle block of computation
+		
+		if (years>2)// in this case loop for middle cycle will calculate the amount
+		{
+			count=years-2;
+			for (int i=0;i<=count;i++)
+				intAmount=intAmount.add(ComputeInterest.getInterestAmount(osAmount, InterestConstant.NO_1, InterestConstant.NO_1, intRate));
+		}
+		
+		// last block of computation
+		if (InterestUtils.isLeapYear(endDate))
+		{
+			noOfDays=366;
+		}
+		diff = Math.abs(endDate.getTime()-InterestUtils.getStartOfYear(endDate).getTime());
+		tempTenor = (int) (diff / (24 * 60 * 60 * 1000))+InterestConstant.NO_1;
+		intAmount=intAmount.add(ComputeInterest.getInterestAmount(osAmount, tempTenor, noOfDays, intRate));
+		
+		LOGGER.info(InterestConstant.EXIT+className+".calculateInterest()");
+		return intAmount.setScale(InterestConstant.FINAL_PRECISION,InterestConstant.ROUNDING_MODE);
+		
+	}
+
+
+	CalculationGermanInclusiveMethodStrategy.java
+•	Implementation of CalculationMethodStrategy interface
+•	Calculates interest using Calculation Method –German Inclusive or 360d/year – 30 days/month
+
+public BigDecimal calculateInterest(Date startDate, Date endDate,
+			Float intRate, BigDecimal osAmount) {
+		LOGGER.info(InterestConstant.ENTER+className+".calculateInterest()");
+		int tenor=0;
+		tenor= (endDate.getDate())+(InterestUtils.getMonths(startDate, endDate)*30)+(30-startDate.getDate()+1);
+		LOGGER.info(InterestConstant.EXIT+className+".calculateInterest()");
+		return ComputeInterest.getInterestAmount(osAmount, tenor, 360, intRate).setScale(InterestConstant.FINAL_PRECISION, InterestConstant.ROUNDING_MODE);
+	}
+
+	CalculationGermanMethodStrategy.java
+•	Implementation of CalculationMethodStrategy interface
+•	Calculates interest using Calculation Method –German or 360d/year – 30 days/month -1
+
+public BigDecimal calculateInterest(Date startDate, Date endDate,
+			Float intRate, BigDecimal osAmount) {
+		LOGGER.info(InterestConstant.ENTER+className+".calculateInterest()");
+		int tenor=0;
+		tenor= (endDate.getDate())+(InterestUtils.getMonths(startDate, endDate)*30)+(30-startDate.getDate()+1);
+		LOGGER.info(InterestConstant.EXIT+className+".calculateInterest()");
+		return ComputeInterest.getInterestAmount(osAmount, tenor, 360, intRate).setScale(InterestConstant.FINAL_PRECISION, InterestConstant.ROUNDING_MODE);
+	}
+
+
+	CalculationInternationalInclusiveMethodStrategy.java
+•	Implementation of CalculationMethodStrategy interface
+•	Calculates interest using Calculation Method – International Inclusive or 360d/year – real nb of days/month 
+
+			
+		public BigDecimal calculateInterest(Date startDate, Date endDate,
+			Float intRate, BigDecimal osAmount) {
+			LOGGER.info(InterestConstant.ENTER+className+".calculateInterest()");
+			long diff = Math.abs(endDate.getTime() - startDate.getTime());
+			int tempTenor = (int) (diff / (24 * 60 * 60 * 1000))+1;
+			LOGGER.info(InterestConstant.EXIT+className+".calculateInterest()");
+return ComputeInterest.getInterestAmount(osAmount, tempTenor, 360, intRate).setScale(InterestConstant.FINAL_PRECISION, InterestConstant.ROUNDING_MODE);
+		}
+			
+
+1.3.5	 Proposed design of batches for Interest Proration & Perintsett
+
+The following table shows the batches present in the Interest Module and the parameters required to run the batches
+
+Batch Name	Parameters Required
+run_interest_proration.sct	<branch_code> <run_date>  where
+-	branch_code is the 5 digit branch code
+-	run_date in the format ‘yyyymmdd’
+run_interest_perintsett.sct	<branch_code> <run_date> <product_code> where 
+-	branch_code is the 5 digit branch code
+-	run_date in the format ‘yyyymmdd’
+-	product_code is the 2 digit product code
+ 
+Examples of running the batch :
+-	run_interest_proration.sct 00001 20121001 (where 00001 is the branch code and 20121001 is the run date)
+-	run_interest_perintsett.sct 09066 20121031 PF (where 09066 is the branch code, 20121031 is the run date and PF is the product code)
+
+
+
+Proration Batch –
+
+Interest proration Batch is to be implemented using Spring Batch Framework and will be responsible for generation of daily accruals for the interest running on respective products. 
+
+In order to implement the Proration batch in Spring Batch framework we need to define Proration JOB definition in proration-job.xml.
+
+Following is job configuration: 
+
+<batch:job id="prorationJob">
+		<batch:step id="step1">
+			<batch:tasklet>
+				<batch:chunk reader="prorationReader" processor="prorationProcessor"
+					writer="prorationWriter" commit-interval="2000" />
+			</batch:tasklet>
+		</batch:step>
+		
+		<batch:listeners>
+			<batch:listener ref="paramDataListener" />
+		</batch:listeners>
+		
+	</batch:job>
+
+Interest Proration Job consists of four components
+
+	ProrationReader
+	ProrationProcessor
+	ProrationWriter
+
+
+Class Diagram for Interest ProrationReader :
+
+
+ 
+
+	ProationReader is responsible for fetching references of deals which are eligible for accrual process in the form of InterestTransaction objects which are further pass to ProrationProcessor for generation of accruals.
+
+
+SQL to fetch the references eligible for  accrual process is configured using  SQL property of ProrationReader.
+
+
+Configuration of ProrationReader in proration-job.xml :
+
+<bean id="prorationReader" class="com.bnp.ivision.common.readers.proration.ProrationReader">
+		<property name="dataSource" ref="dataSource" />
+		<property name="fetchSize" value="2000" />
+		<property name="rowMapper">
+			<bean class="org.springframework.jdbc.core.BeanPropertyRowMapper">
+				<property name="mappedClass"
+					value="com.bnp.ivision.common.domain.InterestTransaction"></property>
+			</bean>
+		</property>
+		<property name="sql">
+		<value>
+		
+				<![CDATA[
+				SELECT 
+TNX_DTTM               tnxDttm          ,
+REC_INVL_FLAG          recInvlFlag      ,
+INT_CAT_CODE           intCatCode       ,
+INT_CODE               intCode          ,
+PROD_CODE              prodCode         ,
+BRCH_CODE              brchCode         ,
+REF_ID                 refId            ,
+TNX_ID                 tnxId            ,
+RPX_XID                rpxXid           ,
+ADVN_PYMT_DATE         advnPymtDate     ,
+CALC_INT_FROM_DATE     calcIntFromDate  ,
+INT_END_DATE           intEndDate       ,
+DECODE(INT_PYMT_METH_CODE,'06',
+CALC_INT_FROM_DATE, 
+INT_SRT_DATE)          intSrtDate       ,
+INT_SRT_DATE           origIntSrtDate   ,
+LAST_INT_PROC_DATE     lastIntProcDate  ,
+NEXT_INT_PROC_DATE     nextIntProcDate  ,
+RATE_VAL_DATE          rateValDate      ,
+IDX_NO                 idxNo            ,
+DAYS_ADD               daysAdd          ,
+INT_RATE               intRate          ,
+RPX_SEQ                rpxSeq           ,
+SETT_INT_EXCH_RATE     settIntExchRate  ,
+DEFD_INT_AMT           defdIntAmt       ,
+DFLT_INT_AMT           dfltIntAmt       ,
+
+PERD_INT_AMT           perdIntAmt       ,
+SETT_INT_AMT           settIntAmt       ,
+TOT_INT_AMT            totIntAmt        ,
+TOT_INT_SETT_AMT       totIntSettAmt    ,
+WVED_INT_AMT           wvedIntAmt       ,
+MDFY_RATE_FLAG         mdfyRateFlag     ,
+MLTY_RATE_FLAG         mltyRateFlag     ,
+BASE_RATE_CODE         baseRateCode     ,
+INT_CALC_METH_CODE     intCalcMethCode  ,
+INT_CMPD_METH_CODE     intCmpdMethCode  ,
+INT_PYMT_CODE          intPymtCode      ,
+INT_PYMT_METH_CODE     intPymtMethCode  ,
+INT_RATE_TYPE_CODE     intRateTypeCode  ,
+LINK_PROD_CODE         linkProdCode     ,
+INT_CUR_CODE           intCurCode       ,
+INT_PYMT_MMDD_IND      intPymtMmddInd   ,
+MARG_RATE_CODE         margRateCode     ,
+LINK_REF_ID            linkRefId        ,
+SETT_INT_ACT_NO        settIntActNo     ,
+MDFY_COF_RATE          mdfyCofRate      ,
+COF_RATE               cofRate          ,
+REFIX_INT_RATE         refixIntRate     ,
+PRO_TERM               proTerm          
+        FROM dbt_c_int_tnx I
+     
+       WHERE I.brch_code = ?
+           
+         AND I.int_cat_code <> '05'
+                     
+         AND I.REF_ID LIKE ?
+         
+         AND I.PROD_CODE LIKE ?
+            
+         --AND TO_DATE(SUBSTR(I.tnx_id, 1, 6), 'yymmdd') <= TO_DATE('20141220','YYYYMMDD')
+         
+         --testing for holiday handling START
+         
+         --AND I.INT_SRT_DATE <= TO_DATE(?,'YYYYMMDD')
+         
+         AND I.INT_SRT_DATE < (select TO_DATE(parm_data_2,'YYYYMMDD') from dbt_c_param_data where parm_id='P006' and brch_code=i.brch_code and TO_DATE(parm_data_1,'YYYYMMDD')=TO_DATE(?,'YYYYMMDD'))
+         
+         --testing for holiday handling END
+            
+         AND I.tnx_id = (SELECT MAX(I2.tnx_id)
+			           
+                           FROM dbt_c_int_tnx I2, tfv_tnx vtnx
+                         
+                          WHERE I2.brch_code = I.brch_code
+                            AND I2.prod_code = I.prod_code
+                            AND I2.ref_id = I.ref_id
+                            AND I2.int_code = I.int_code
+                            AND (CASE 
+                                WHEN I2.int_pymt_meth_code = '06' THEN I2.CALC_INT_FROM_DATE 
+                                ELSE I2.int_srt_date
+                                END) <=  TO_DATE(?,'YYYYMMDD') - 1 
+                         -- Added condition so that overdue should be picked in case overdue starting on a weekend
+                         -- And in case of month end, the current interest transaction to be picked and not the transaction for the next month
+                            AND (CASE 
+                                WHEN I2.INT_PYMT_METH_CODE = '06' AND I2.LAST_INT_PROC_DATE IS NOT NULL AND TO_DATE(?,'YYYYMMDD') >= I2.INT_END_DATE THEN I2.LAST_INT_PROC_DATE
+                                WHEN I2.INT_PYMT_METH_CODE = '06' AND I2.LAST_INT_PROC_DATE IS NOT NULL AND I2.LAST_INT_PROC_DATE < I2.INT_END_DATE THEN I2.LAST_INT_PROC_DATE + 1
+                                WHEN I2.INT_PYMT_METH_CODE = '06' AND I2.INT_END_DATE IS NULL AND I2.LAST_INT_PROC_DATE <= TO_DATE(?,'YYYYMMDD') THEN I2.LAST_INT_PROC_DATE + 1
+                                ELSE TO_DATE(?,'YYYYMMDD')
+                                END) <= TO_DATE(?,'YYYYMMDD')
+                         
+                         AND vtnx.ref_id = I.ref_id
+                         AND vtnx.tnx_stat_code = '03'
+                         AND I2.tnx_id = vtnx.tnx_id
+                        
+                         )
+           
+         AND ((NVL(I.pro_term, 'N') =
+             'N') OR (NVL(I.pro_term, 'C') = 'C') OR
+             (NVL(I.pro_term, 'D') = 'D'))
+
+       ORDER BY ref_id, int_code ]]>
+		</value>
+        </property>
+        <property name="preparedStatementSetter" ref="prorationPreparedStatementSetter" />
+	</bean>
+
+
+
+
+Class Diagram for Interest ProrationProcessor:
+
+
+
+ 
+
+	ProationProcessor is responsible to generation of accruals (List of RecordOperation objects ) based on transaction objects received from ProrationReader
+	List of RecordOperation objects are further passed to ProrationWriter which are further inserted in Database table DBT_C_RO_HDR and DBT_C_RO_DET
+
+Configuration of ProrationProcessor in proration-job.xml:
+
+<bean id="prorationProcessor" class="com.bnp.ivision.common.processors.ProrationProcessor" >
+		<property name="batchDaoUtils" ref="batchDaoUtils" />
+		<property name="exchangeRate" ref="exchangeRate"/>
+</bean>
+
+
+
+
+
+
+
+Class Diagram for Interest ProrationWriter :
+
+ 
+
+	ProationWriter is responsible for inserting List of RecordOperation objects received from ProrationProcessor in Database Table DBT_C_RO_DET, DBT_C_RO_HDR
+Configuration of ProrationWriter in proration-job.xml:
+
+<bean id="prorationWriter" class="com.bnp.ivision.common.writers.ProrationWriter">
+			 <property name="batchDao" ref="ivisionBatchDao" />
+	</bean>
+
+Perintsett Batch –
+
+Interest perintsett Batch is to be implemented using Spring Batch Framework and will be responsible for generation of monthly settlements for the interest running on respective products. 
+
+In order to implement the perintsett batch in Spring Batch framework we need to define perintsett JOB definition in perintsett-job.xml.
+
+Following is job configuration: 
+
+<batch:job id="perintsettJob">
+		<batch:step id="step1">
+			<batch:tasklet>
+				<batch:chunk reader="perintsettReader" processor="perintsettProcessor"
+					writer="perintsettWriter" commit-interval="2000" />
+			</batch:tasklet>
+		</batch:step>
+		
+		<batch:listeners>
+			<batch:listener ref="perintsettDataListener" />
+		</batch:listeners>
+		
+	</batch:job>
+
+
+
+
+Interest Perintsett Job consists of four components
+
+	PerintsettReader
+	PerintsettProcessor
+	PerintsettWriter
+
+
+PerintsettReader :
+
+	PerintsettReader is responsible for fetching references of deals which are eligible for monthly settlement process in the form of PerintsettInterestTnxRecord objects which are further pass to PerintsettProcessor for generation of monthly settlement statements.
+
+
+SQL to fetch the references eligible for  accrual process is configured using  SQL property of PerintsettReader.
+
+
+Configuration of PerintsettReader in perintsett-job.xml :
+
+<bean id="perintsettReader" class="com.bnp.ivision.common.readers.PerintsettReader">
+		<property name="dataSource" ref="dataSource" />
+		<property name="fetchSize" value="2000" />
+		<property name="rowMapper">
+			<bean class="com.bnp.ivision.common.mappers.PerintSettDataRowMapper" />
+		</property>
+		<property name="sql">
+		<value>
+				<![CDATA[
+				   SELECT BRCH_CODE,
+                 PROD_CODE,
+                 REF_ID,
+                 INT_CAT_CODE,
+                 IDX_NO,
+                 INT_CODE,
+                 NULL REL_PROD_CODE,
+                 NULL REL_REF_ID,
+                 DECODE(INT_PYMT_METH_CODE,'06',
+				 CALC_INT_FROM_DATE, 
+				 INT_SRT_DATE)  INT_SRT_DATE,
+                 INT_END_DATE,
+                 CALC_INT_FROM_DATE,
+                 INT_CUR_CODE,
+                 INT_CALC_METH_CODE,
+                 INT_PYMT_METH_CODE,
+                 INT_RATE_TYPE_CODE,
+                 BASE_RATE_CODE,
+                 INT_RATE,
+                 DEFD_INT_AMT,
+                 SETT_INT_ACT_NO,
+                 SETT_INT_EXCH_RATE,
+                 NVL(MLTY_RATE_FLAG, 'N') MLTY_RATE_FLAG,
+                 MDFY_RATE_FLAG,
+                 NEXT_INT_PROC_DATE,
+                 INT_PYMT_MMDD_IND,
+                 PERD_INT_AMT,
+                 LINK_PROD_CODE,
+                 LINK_REF_ID,
+                 ADVN_PYMT_DATE -- ENG 20060406 EXTENSO 5107
+            FROM DBT_C_INTEREST I
+           WHERE BRCH_CODE = ? 
+             AND PROD_CODE = ?
+             AND REF_ID = ?
+             AND NEXT_INT_PROC_DATE IS NOT NULL             
+             AND NEXT_INT_PROC_DATE < (select TO_DATE(parm_data_2,'YYYYMMDD') from dbt_c_param_data where parm_id='P006' and brch_code=I.brch_code and TO_DATE(parm_data_1,'YYYYMMDD')=TO_DATE(?,'YYYYMMDD'))
+             AND NVL(MLTY_RATE_FLAG, 'N') = 'N'
+             
+          
+           ORDER BY REF_ID, INT_CODE ]]>
+		</value>
+        </property>
+        <property name="preparedStatementSetter" ref="perintsettPreparedStatementSetter" />
+    </bean>
+
+
+
+PerintsettProcessor:
+
+	PerintsettProcessor is responsible to generation of monthly settlement statements based on transaction objects received from PerintsettReader
+	The various statement objects are further passed to PerintsettWriter which are further inserted in Database tables DBT_C_RO_HDR, DET DBT_C_RO_DET, DBT_C_ACT_ENTRY, DBT_C_SETT, DBT_C_INT_TNX
+
+Configuration of PerintsettProcessor in perintsett-job.xml:
+
+<bean id="perintsettProcessor" class="com.bnp.ivision.common.processors.PerintsettProcessor" >
+	<property name="batchDaoUtils" ref="batchDaoUtils" />
+	<property name="roCustBankDrCrGen" ref="roCustBankDrCrGen" />
+	<property name="roIntAccrualGen" ref="roIntAccrualGen"/>
+	<property name="exchangeRate" ref="exchangeRate"/>
+</bean>
+
+
+
+
+
+
+PerintsettWriter :
+
+
+	PerintsettWriter is responsible for inserting and updating the monthly settlmenet entries received from PerintsettProcessor in Database Tables DBT_C_RO_HDR, DET DBT_C_RO_DET, DBT_C_ACT_ENTRY, DBT_C_SETT, DBT_C_INT_TNX, DBT_C_INTEREST and DBT_C_INT_STATEMENT
+
+Configuration of PerintsettWriter in perintsett-job.xml:
+
+<bean id="perintsettWriter" class="com.bnp.ivision.common.writers.PerintsettWriter">
+		 <property name="batchDao" ref="ivisionBatchDao" />
+	</bean>
+
+1.3.6			Workflow
+
+Below Example shows the workflow of a transaction with New, Update and Settle steps:
+
+Steps of Transaction	Interest Types	Calculation Method	Rate Type Code	Payment Method
+EP New	Normal
+
+Overdue	02 - 360	Fixed	Arrear
+EP Update 				
+EP Full settle				
+
+
+STEP1: 	EP New
+Transaction value date: 31/10/2012
+
+
+ 
+
+ 
+
+ 
+
+
+•	On click of Validate button of each Interest Details box,  call is made to the Interest Web Service, and the Interest details of Ivision are sent to it in an XML format.
+
+•	The web service computes the Interest amount based on the given details and sends an Interest XML back to Ivision, with <to_be_inserted> tag.
+
+•	This tag contains the tuples to be inserted in the dbt_c_int_statement table.
+
+
+For example, below is the Interest xml returned for Normal Interest.
+<tnx_interest> 
+<advn_pymt_date>03/12/2012</advn_pymt_date> 
+<base_rate_code>01</base_rate_code> 
+<brch_code>00003</brch_code> 
+<calc_int_from_date/> 
+<cof_rate>0.23</cof_rate> 
+<days_add/> 
+<defd_int_amt>0.00</defd_int_amt> 
+<dflt_int_amt>0</dflt_int_amt> 
+<idx_no>0</idx_no> 
+<int_calc_meth_code>02</int_calc_meth_code> 
+<int_cmpd_meth_code/> 
+<int_code>01</int_code> 
+<int_decode>Normal</int_decode> 
+<int_cur_code>SGD</int_cur_code> 
+<int_end_date>03/12/2012</int_end_date> 
+<int_pymt_code/> 
+<int_pymt_meth_code>02</int_pymt_meth_code> 
+<int_pymt_mmdd_ind/> 
+<int_rate>1.63</int_rate> 
+<int_rate_type_code>01</int_rate_type_code> 
+<int_srt_date>31/10/2012</int_srt_date> 
+<last_int_proc_date/> 
+<marg_rate_code/> 
+<mdfy_cof_rate/> 
+<mdfy_rate_flag>Y</mdfy_rate_flag> 
+<mlty_rate_flag>N</mlty_rate_flag> 
+<next_int_proc_date/> 
+<perd_int_amt/> 
+<rate_val_date>31/10/2012</rate_val_date> 
+<rec_invl_flag>N</rec_invl_flag> 
+<refix_int_rate/> 
+<rpx_seq/> 
+<rpx_xid/> 
+<sett_int_act_no/> 
+<sett_int_amt>0</sett_int_amt> 
+<sett_int_exch_rate/> 
+<tnx_dttm/> 
+<tot_int_amt>0</tot_int_amt> 
+<tot_int_sett_amt>0.00</tot_int_sett_amt> 
+<tot_int_sett_amt_tmp>0.00</tot_int_sett_amt_tmp> 
+<wved_int_amt/> 
+<o_calc_int_from_date/> 
+<disp_int_rate>1.63</disp_int_rate> 
+<base_rate>0.13</base_rate> 
+<marg_rate>1.5</marg_rate> 
+<mdfy_int_amt_flag>N</mdfy_int_amt_flag> 
+<int_wrk_id/> 
+<disp_int_amt>0</disp_int_amt> 
+<tnx_type_code>01</tnx_type_code> 
+<tnx_interest_statements/> 
+<to_be_inserted> 
+<tnx_interest_statement> 
+<brch_code>00003</brch_code> 
+<stmt_id>1</stmt_id> 
+<ref_id/> 
+<tnx_id/> 
+<int_end_date>2012-12-03 00:00:00.0</int_end_date> 
+<int_srt_date>2012-10-31 00:00:00.0</int_srt_date> 
+<tnx_dttm>2012-10-31 00:00:00.0</tnx_dttm> 
+<int_rate>1.63</int_rate> 
+<int_rate_type_code>01</int_rate_type_code> 
+<perd_int_amt>29.883</perd_int_amt> 
+<os_amt>20000</os_amt> 
+<is_usable>Y</is_usable> 
+<is_reverse>N</is_reverse> 
+<is_settled>N</is_settled> 
+<int_code>01</int_code> 
+<mdfy_rate_flag>Y</mdfy_rate_flag> 
+<partially_settled>N</partially_settled> 
+</tnx_interest_statement> 
+</to_be_inserted> 
+<to_be_updated/> 
+<precedent_interest_end_date/> 
+<tnx_interest_image> 
+<brch_code>00003</brch_code> 
+<os_amt>20,000.00</os_amt> 
+<cus_mst_no>00001037020</cus_mst_no> 
+<int_cur_code>SGD</int_cur_code> 
+<int_end_date>03/12/2012</int_end_date> 
+<int_srt_date>31/10/2012</int_srt_date> 
+<base_rate_tnr>33</base_rate_tnr> 
+<int_matu_date>03/12/2012</int_matu_date> 
+<dest_cty_code>98</dest_cty_code> 
+<fund_srt_date>31/10/2012</fund_srt_date> 
+<fund_due_date>03/12/2012</fund_due_date> 
+<fac_item_code/> 
+<tnx_val_date>31/10/2012</tnx_val_date> 
+<precedent_interest_end_date/> 
+</tnx_interest_image> 
+</tnx_interest> 
+
+•	After save complete and control of transaction, the <to_be_inserted> tuple is saved in dbt_c_int_statement table by Ivision.
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+•	After control of transaction, two tuples are inserted in the table dbt_c_int_statement.
+One for Normal Interest(int_code=’01’) and the other for Overdue Interest(int_code=’03’)
+
+The IS_USABLE flag is Y.
+This is used by Proration batch to identify that these statements are the latest to be picked up while scanning the interest history, in order to generate the proration ROs.
+
+ 
+
+
+•	Proration Batch:
+
+Now, Proration batch is run at EOD, with run date as 20121031
+
+The Proration batch will scan Interest history based on dbt_c_int_tnx table and the dbt_c_int_statement table and generate the Ros for the last controlled transaction.
+
+•	The batch first selects the rows from dbt_c_int_tnx which are last controlled.
+
+•	The history of statements in dbt_c_int_statement is scanned. It fetches all the rows for the reference with transaction id got from dbt_c_int_tnx table, and which has Is_Usable as Y.
+
+•	For the statement got from dbt_c_int_statement table, it performs these steps:
+
+o	Since calculation method is 360, Calculation360MethodStrategy is used.
+o	These inputs are passed to the Strategy method:
+StartDate	: 31/10/2012
+EndDate	: 01/11/2012
+Rate		: 1.63
+OS Amount	: 20000
+
+Tenor is difference between start date and end date which is 1, in this case
+o	Interest is computed with the formula:
+(20,000 * 1.63*1)/(360*100)
+o	Interest Amount =  0.9055555528
+
+o	Final Precision applied: 5
+o	Rounding Mode applied: HALF UP
+
+o	After applying Final Precision and Rounding mode
+amount.setScale(finalprecision,roundingmode)
+The amount is : 0.90556
+
+o	Custom Precision applied: 3
+o	Amount after roundup, with custom precision: 0.906
+
+o	Precision applied: 2
+
+o	Amount after roundup with Precision 2: 
+0.91
+o	So, the final amount is 0.91 
+
+The same rounding and precision logic, is applied for all the transactions.
+
+ 
+
+
+Similarly, batch will be run everyday at EOD and Ros will be generated.
+
+
+
+•	STEP 2: EP Update
+Transaction value date: 21/11/2012
+
+
+ 
+
+
+
+•	Now,  Rate is updated from 1.63 to 2, with rate value date as 21/11/2012
+ 
+
+Now for Normal Interest, there will be two tuples generated;
+1st Tuple:
+Start date: 31/10/2012
+End Date : 21/11/2012
+Int_rate: 1.63
+Usable Flag: Y
+Settled Flag: N
+
+2nd Tuple:
+Start date: 21/11/2012
+End Date : 03/12/2012
+Int_rate: 2
+Usable Flag: Y
+Settled Flag: N
+
+
+So now, the web service returns the below <to_be_inserted> tag, in Interest xml:
+
+<to_be_inserted> 
+<tnx_interest_statement> 
+<brch_code>00003</brch_code> 
+<stmt_id>1</stmt_id> 
+<ref_id>EPA1400036</ref_id> 
+<int_end_date>2012-11-21 00:00:00.0</int_end_date> 
+<int_srt_date>2012-10-31 00:00:00.0</int_srt_date> 
+<tnx_dttm>2012-11-21 00:00:00.0</tnx_dttm> 
+<int_rate>1.63</int_rate> 
+<int_rate_type_code>01</int_rate_type_code> 
+<perd_int_amt>19.017</perd_int_amt> 
+<os_amt>20000</os_amt> 
+<is_usable>Y</is_usable> 
+<is_reverse>N</is_reverse> 
+<is_settled>N</is_settled> 
+<int_code>01</int_code> 
+<mdfy_rate_flag>Y</mdfy_rate_flag> 
+<partially_settled>N</partially_settled> 
+</tnx_interest_statement> 
+<tnx_interest_statement> 
+<brch_code>00003</brch_code> 
+<stmt_id>2</stmt_id> 
+<ref_id>EPA1400036</ref_id> 
+<int_end_date>2012-12-03 00:00:00.0</int_end_date> 
+<int_srt_date>2012-11-21 00:00:00.0</int_srt_date> 
+<tnx_dttm>2012-11-21 00:00:00.0</tnx_dttm> 
+<int_rate>2</int_rate> 
+<int_rate_type_code>01</int_rate_type_code> 
+<perd_int_amt>13.333</perd_int_amt> 
+<os_amt>20000</os_amt> 
+<is_usable>Y</is_usable> 
+<is_reverse>N</is_reverse> 
+<is_settled>N</is_settled> 
+<int_code>01</int_code> 
+<mdfy_rate_flag>Y</mdfy_rate_flag> 
+<partially_settled>N</partially_settled> 
+</tnx_interest_statement> 
+</to_be_inserted>
+The above tuples will be inserted in the dbt_c_int_statement table after control of transaction.
+
+•	The old tuple for Normal Interest, which was generated during New transaction will be returned in <to_be_updated> tag, with Is_Usable flag as N 
+
+<to_be_updated> 
+<tnx_interest_statement> 
+<brch_code>00003</brch_code> 
+<stmt_id>1</stmt_id> 
+<ref_id>EPA1400036</ref_id> 
+<tnx_id>12103100001070</tnx_id> 
+<int_end_date>2012-12-03 00:00:00.0</int_end_date> 
+<int_srt_date>2012-10-31 00:00:00.0</int_srt_date> 
+<tnx_dttm>2012-10-31 00:00:00.0</tnx_dttm> 
+<int_rate>1.63</int_rate> 
+<int_rate_type_code>01</int_rate_type_code> 
+<perd_int_amt>29.883</perd_int_amt> 
+<os_amt>20000</os_amt> 
+<is_usable>N</is_usable> 
+<is_reverse>N</is_reverse> 
+<is_settled>N</is_settled> 
+<int_code>01</int_code> 
+<mdfy_rate_flag>Y</mdfy_rate_flag> 
+<partially_settled>N</partially_settled> 
+</tnx_interest_statement> 
+</to_be_updated>
+
+So, in dbt_c_int_statement table, the old tuple, which was generated during New transaction, will be updated with IS_USABLE flag as ‘N’
+
+ 
+Similarly, for Overdue Interest, <to_be_inserted> tuple will be generated and <to_be_updated> tuple will be generated to mark old tuple as Is_Usable as ‘N’.
+
+ 
+
+
+ 
+
+Again, proration batch will run at EOD.
+For amount computation and rounding, same strategy is applied, as given during New transaction.
+
+
+
+
+
+STEP 3: EP Settle
+Transaction value date: 03/12/2012
+
+ 
+
+
+ 
+
+•	Web service returns the <to_be_inserted> tuples, which will be inserted into dbt_c_int_statement table after control.
+•	And <to_be_updated> tuples which will be updated with Is_usable flag as ‘N’. The previous transaction tuples will be marked with Is_Usable as ‘N’.
+
+
+The to_be_inserted tuples are:
+
+1st Tuple:
+Start date: 31/10/2012
+End Date : 21/11/2012
+Int_rate: 1.63
+Usable Flag: Y
+Settled Flag: Y
+
+2nd Tuple:
+Start date: 21/11/2012
+End Date : 03/12/2012
+Int_rate: 2
+Usable Flag: Y
+Settled Flag: Y
+
+ 
+Since Overdue Interest had,  not yet started the <to_be_inserted> tuple will be blank and tuple will NOT  be inserted in dbt_c_int_statement table for Overdue Interest.
+
+ 
+
+
+Proration batch is run with Run date as 20121203
+
+ 
+	
+ 
+
+
+1.3.7			Example of Presettlement of Interest In Arrears
+
+•	For interests in Arrears, in case of Interest pre-settlement, the accruals for the remaining part of interest should re-start from 0, meaning, the start date of interest will be the day of pre-settlement. The day of pre-settlement, 2 set of accruals will be generated: one to post the pre-settled amount of interest – accruals amount will be retrieved directly from the pre-settlement amount without recalculation, and a second one to post 1 day of accruals for the remaining part. 
+
+•	The below cases of Presettlement in Arrears are possible:
+1.	Pre-settlement during a partial settlement
+2.	Pre-settlement during any update of the loan
+3.	Pre-settlement during an extension
+
+
+Example:   Pre-settlement during Partial Settle
+
+Step 1: 
+Transaction	EP	New
+
+01/10/2012
+
+ 
+
+ 
+Entries in dbt_c_int_statement table are :
+
+ 
+
+ 
+
+The value of Pre-Settle flag is N.
+
+
+Step 2: 
+
+Transaction	EP	Partial Settle
+
+31/10/2012
+
+Normal Interest is Pre-settled
+ 
+
+ 
+Entries in dbt_c_int_statement table are :
+
+ 
+
+The normal Interest duration is from 1/10 to 03/12
+
+As seen in the statements on screen , 
+ the Interest from 1/10 to 2/10 and 2/10 to 31/10  has been pre-settled.
+
+Hence, we split the Interest Statements in webservice as below:
+1/10 – 2/10 : presettled Y
+2/10 – 31/10 : presettled Y
+31/10 – 3/12 : presettled N
+
+1.  The statements for Normal Interest from 1/10 to 2/10 and 2/10 to 31/10 are marked with Pre-settled Flag as Y.
+2.  The statement for the remaining tenor, 31/10 to 3/12 is marked with Pre-settled flag as Y.
+
+
+Ros generated :
+
+ 
+
+
+As seen above 2 sets of accruals  44/50 are generated on the day of Pre settle, and interest amount restarts with zero.
+The handling for this is done in the files ProrationProcessor.java and BatchDaoUtils.java
+
+BatchDaoUtils.java
+
+
+BigDecimal intGeneralAmt = BigDecimal.ZERO;  //This is the amount which starts from zero 
+BigDecimal intModifiedOrPresettleAmt = null; //This is the amount which is pre-settled
+
+InterestAmountVO interestAmountVO = new InterestAmountVO();
+
+for (InterestStatement intstmtsplit : oldList) {
+if ((BatchConstants.FLAG_YES.equals(intstmtsplit.getPreSettled())
+					&& (intstmtsplit.getEndDate() != null && curDate
+							.compareTo(intstmtsplit.getEndDate()) >= 0)
+					&& ((BatchConstants.FLAG_YES.equals(intstmtsplit
+							.getPartiallySettled()) && !BatchConstants.PAYMENT_METHOD_CODE_ADVANCE
+							.equals(intstmtsplit.getIntPymtMethCode())) || (BatchConstants.FLAG_NO.equals(intstmtsplit
+									.getPartiallySettled()))) && !isAdvanceRateChangeSplit(intstmtsplit) )
+					|| (BatchConstants.FLAG_YES.equals(intstmtsplit
+							.getMdfyAmtFlag()))) {
+
+				intModifiedOrPresettleAmt = getModifiedOrPresettleAmt(intstmtsplit, intTxn, batchRunningDate, intModifiedOrPresettleAmt, interestAmountVO, customPrecision);
+}
+}
+
+intGeneralAmt = intGeneralAmt.add(calculationMethodStrategy
+							.calculateInterest(startDate, computationalEndDate,
+									intstmtsplit.getIntRate().floatValue(),				intstmtsplit.getOsAmt(),customPrecision));
+
+generalStmt.setIntAmt(InterestUtils.roundUp(
+				customPrecision, intGeneralAmt));
+
+interestAmountVO.setGeneralInterest(generalStmt);
+interestAmountVO.setModifiedOrPresettledInterest(intModifiedOrPresettleAmt modifiedOrPresettleStmt);
+
+ProrationProcessor.java
+
+	InterestAmountVO interestAmountVO = batchDaoUtils
+				.getTransactionInterestAmount(
+						interestTransaction, nextDate, oldList, currentDate, batchRunningDate
+						);
+
+intAmt = interestAmountVO.getGeneralInterest().getIntAmt();
+
+
+
+
+//It checks that the intGeneralAmt from BatchDaoUtils, is greater than 0, which means interest was presettled and intGeneralAmt is the remaining amount which is not presettled.
+
+Hence, the accrual ROs for this amount are added to the Record Operation List, in addition to the Ros for the presettled amount
+
+		if (intAmt.compareTo(BigDecimal.ZERO) > 0) {
+			recordOperationList.add(ro44Occur1);
+			recordOperationList.add(ro44Occur2);
+			recordOperationList.add(ro50Occur1);
+			recordOperationList.add(ro50Occur2);
+		}
+
+
+1.3.8			Example of PerintSett with Monthly Transaction
+
+
+•	Column Monthly_settled  in the table dbt_c_int_statement is used to identify whether a statement put in the table, has been inserted by perintsett batch or not.
+•	 Y –  denotes that the interest for that duration has been settled by perintsett batch
+•	 N – denotes that statement is not a perintsett statement
+•	
+Transaction	PF	New
+01/10/2012
+
+ 
+
+ 
+
+ 
+
+Entries in dbt_c_int_statement are :
+
+
+ 
+
+
+•	Proration is run from 01/10 to 30/10
+
+•	On 31/10, first Perintsett batch is run, and then Proration batch is run
+
+
+ 
+
+Perintsett has settled the interest at month end. Hence the statements are split
+•	1st Oct to 1st Nov – Monthly Settled as Y
+•	1st Nov to Normal End Date - Monthly Settled as N
+
+
+The Ros generated by perintsett are :
+
+ 
+
+
+The Ros generated by Proration are :
+
+ 
+
+Similarly Perintsett settles the interest on 30 Nov and generates the ROs.
+
+
+
+Step 2: 
+		
+Transaction	PF	Full Settle
+Tnx date : 3/12/2012
+Back value date: 2/12/2012
+
+ 
+
+ 
+
+
+•	Since Interest upto 30 Nov has been settled by perintsett, when settle is selected on screen, the Interest is settled from 1/12 to transaction value date.
+
+ 
+
+
+Proration ROs generated after full settle:
+
+ 
+
+
+
+1.3.9			Example of  Monthly Transaction with Fixed at Maturity/Month end
+
+Transaction	EP	New
+
+1/31/2013
+
+ 
+
+ 
+
+
+•	Perintsett run on 29/03, which is month end for March
+
+•	For Fixed at month end maturity, the calculation is implemented using Recursion for fetching the interest rate applicable for each monthwise period.
+
+
+InterestRate.java
+
+public List<InterestStatementSnippet> getFixedAtMonthendMaturityInterestRate(Date startDate,
+			Date endDate, String branchCode, String currencyCode,
+			String baseRateCode, List<InterestStatementSnippet> intstatement) {
+
+String queryStr = "SELECT  TO_CHAR(VAL_DATE,'YYYYMMDD') VAL_DATE, TO_CHAR(VAL_END_DATE,'YYYYMMDD') VAL_END_DATE, BASE_RATE\n"
+					+ "  FROM DBT_C_BASE_RATE\n"
+					+ " WHERE brch_code = ?\n"
+					+ "   AND base_rate_code = ?\n"
+					+ "   AND cur_code = ?\n"
+					+ "   AND cut_off_tenor >= NVL(?, '0')\n"
+					+ "   AND val_date <= ?\n"
+					+ "   AND (val_end_date IS NULL OR\n"
+					+ "       val_end_date > ?)\n"
+					+ " ORDER BY wild_card_ind ASC, cut_off_tenor ASC";
+		
+	Object[] objPrm = { branchCode, baseRateCode, currencyCode, tenor,
+					startDate, startDate };
+
+
+•	This query is used to fetch the interest rate for that period.
+
+
+//Iterating over the base rate and val_date, val_end_date returned by the query and preparing statements
+
+List<Object[]> objList = this.getResultList(queryStr, objPrm);
+			
+if (objList.size() > 0) {
+	Object[] objArr = objList.get(0);
+InterestStatementSnippet intstmt = new InterestStatementSnippet();
+	if(intstatement.size()>0){
+		intstmt.setStartDate(InterestUtils.addDaysToDate(startDate, 1));
+	}
+	else{
+		intstmt.setStartDate(startDate);
+	}
+					intstmt.setEndDate(InterestUtils.addDaysToDate(InterestUtils.getMonthEnd(InterestUtils.addDaysToDate(startDate, 1)),1));
+	intstmt.setIntRate(new BigDecimal(objArr[2] + ""));
+									
+					
+					if(InterestUtils.getMonthEnd(startDate).compareTo(startDate)==0){
+						newStartDate = InterestUtils.addDaysToDate(intstmt.getEndDate(), -1);
+					}
+										
+		if (intstmt.getEndDate().compareTo(endDate) >= 0) {
+			intstmt.setEndDate(endDate);
+			return intstatement;
+		} else {
+			
+			//Recursive call, fetching rate for next period and constructing statements
+return getFixedAtMonthendMaturityInterestRate(
+								InterestUtils.getMonthEnd(newStartDate), endDate, branchCode,currencyCode, baseRateCode, intstatement);
+		}
+	}
+
+}
+
+		return intstatement;
+}
+
+•	PerintSett Ros on 29/03
+
+ 
+
+
+•	Proration Ros on 29/03
+
+ 
+
+
+•	Perintsett run again on 30/04
+
+
+
+
+
+
+Transaction	EP	Full Settle
+		
+
+5/6/2013
+04/27/2013 – back value date
+
+
+ 
+
+ 
+•	For Overdue Interest,  since it’s a back value Settle on 27/04, and Perinsett had settled amount on 30/04, the difference amount is refunded.
+•	Proration is run after full settle.
+
+1.3.10			Migration of live deals to new Interest Module.
+
+The following references will be eligible for migration to the new Interest module, so that after migration, the life cycle of these references can be continued, i.e, user can perform transactions on these references from Ivision screen and can continue with the proration process.
+
+Migration scripts to be provided for each of these stages:
+1.	References in New Stage
+2.	References in Update Stage
+3.	References in Extend Stage
+4.	References in Partial Settle Stage
+
+
+
+
+
+
+
+
+•	Query used to find the references in New Stage eligible for migration :
+SELECT brch_code,prod_code, tnx_type_code, sub_tnx_type_code, ref_id
+FROM tfv_tnx vtn
+WHERE 
+VTN.BRCH_CODE=I_BRCH_CODE and    
+vtn.tnx_id  in  
+(SELECT I.tnx_id
+from dbt_c_int_tnx i
+WHERE I.brch_code in (select brch_code from dbt_m_branch where brch_code=i_brch_code)
+		AND I.int_cat_code <> '05'
+		and i.tnx_id = 
+      	(SELECT MAX(I2.tnx_id) --fetching highest transaction id for getting current state
+		FROM dbt_c_int_tnx I2, tfv_tnx vtnx
+		WHERE I2.brch_code = I.brch_code
+		AND I2.prod_code = I.prod_code
+		and I2.REF_ID = I.REF_ID
+                 and vtnx.tnx_type_code!='16'                
+		and i2.int_code = i.int_code 
+		AND vtnx.ref_id = I.ref_id
+		and vtnx.tnx_stat_code = '03'--only controlled transaction
+                	and I2.brch_code=i_brch_code
+		AND I2.tnx_id = vtnx.tnx_id
+		)
+      and brch_code=i_brch_code
+      )
+ and VTN.TNX_TYPE_CODE='01'—only transactions in new state.
+ GROUP BY prod_code, tnx_type_code, sub_tnx_type_code, ref_id, brch_code;
+
+Example of a reference that was last in New stage  and has been migrated to new Interest module and the further transactions carried out using new module:
+
+ 
+
+
+
+
+•	Query used to find the references in ‘Update’ stage eligible for migration:
+SELECT brch_code,prod_code, tnx_type_code, sub_tnx_type_code, ref_id
+FROM tfv_tnx vtn
+WHERE 
+VTN.BRCH_CODE=I_BRCH_CODE and    
+vtn.tnx_id  in  
+(SELECT I.tnx_id
+from dbt_c_int_tnx i
+WHERE I.brch_code in (select brch_code from dbt_m_branch where brch_code=i_brch_code)
+AND I.int_cat_code <> '05'			
+and i.tnx_id = 
+(SELECT MAX(I2.tnx_id) --fetching highest transaction id for getting current state
+		FROM dbt_c_int_tnx I2, tfv_tnx vtnx
+		WHERE I2.brch_code = I.brch_code
+		AND I2.prod_code = I.prod_code
+		and i2.ref_id = i.ref_id
+                	and tnx_type_code!='16'                
+		and i2.int_code = i.int_code 
+		AND vtnx.ref_id = I.ref_id
+		and vtnx.tnx_stat_code = '03'--only controlled transaction
+                	and I2.brch_code=i_brch_code
+		AND I2.tnx_id = vtnx.tnx_id
+		)
+	and BRCH_CODE=I_BRCH_CODE
+    )        
+and VTN.TNX_TYPE_CODE='02'--only transactions in update state.
+GROUP BY prod_code, tnx_type_code, sub_tnx_type_code, ref_id, brch_code;
+
+•	Example of the reference that was last in ‘Update’ state and has been migrated to the new Interest module and further transaction carried out using new module:
+
+ 
+
+•	Query used to find the references in ‘Extend’ stage eligible for migration:
+SELECT brch_code,prod_code, tnx_type_code, sub_tnx_type_code, ref_id
+FROM tfv_tnx vtn
+WHERE 
+VTN.BRCH_CODE=I_BRCH_CODE and    
+ vtn.tnx_id  in  
+		(SELECT I.tnx_id
+		from dbt_c_int_tnx i
+		WHERE I.brch_code in (select brch_code from dbt_m_branch where brch_code=i_brch_code)
+		AND I.int_cat_code <> '05'			
+		and i.tnx_id = 
+(SELECT MAX(I2.tnx_id) --fetching highest transaction id for getting current state
+			FROM dbt_c_int_tnx I2, tfv_tnx vtnx
+			WHERE I2.brch_code = I.brch_code
+			AND I2.prod_code = I.prod_code
+			and i2.ref_id = i.ref_id
+                		and tnx_type_code!='16'                
+			and i2.int_code = i.int_code 
+			AND vtnx.ref_id = I.ref_id
+			and vtnx.tnx_stat_code = '03'--only controlled transaction
+                		and I2.brch_code=i_brch_code
+			AND I2.tnx_id = vtnx.tnx_id
+			)
+      	and BRCH_CODE=I_BRCH_CODE
+ 	       	)        
+and VTN.TNX_TYPE_CODE='04'--only transactions in extend state.
+GROUP BY prod_code, tnx_type_code, sub_tnx_type_code, ref_id, brch_code;    
+•	Example of the reference that was last in ‘extend’ state and has been migrated to the new Interest module and further transaction carried out using new module:
+
+ 
+
+•	Query used to find the references in ‘Partial Settlement’ stage eligible for migration:
+
+SELECT brch_code,prod_code, tnx_type_code, sub_tnx_type_code, ref_id
+FROM tfv_tnx vtn
+WHERE 
+VTN.BRCH_CODE=I_BRCH_CODE and    
+(vtn.tnx_type_code='08' and vtn.sub_tnx_type_code='14') and    -- only transactions in partial settle state.
+vtn.tnx_id  in  
+(SELECT I.tnx_id
+		from dbt_c_int_tnx i
+		WHERE I.brch_code in (select brch_code from dbt_m_branch where brch_code=i_brch_code)
+		AND I.int_cat_code <> '05'			
+		and i.tnx_id = 
+(SELECT MAX(I2.tnx_id) --fetching highest transaction id for getting current state
+			FROM dbt_c_int_tnx I2, tfv_tnx vtnx
+			WHERE I2.brch_code = I.brch_code
+			AND I2.prod_code = I.prod_code
+			and i2.ref_id = i.ref_id
+             and tnx_type_code!='16'                
+			and i2.int_code = i.int_code 
+			AND vtnx.ref_id = I.ref_id
+			and vtnx.tnx_stat_code = '03'--only controlled transactions
+                	and I2.brch_code=i_brch_code
+			AND I2.tnx_id = vtnx.tnx_id
+			)
+      	and BRCH_CODE=I_BRCH_CODE
+        	)        
+GROUP BY prod_code, tnx_type_code, sub_tnx_type_code, ref_id, brch_code;   
+
+
+
+
+•	Example of the reference that was last in ‘partial settlement’ state and has been migrated to the new Interest module and further transaction carried out using new module:
+ 
+
+2.	Impact Analysis
+
+Files to be modified (List the source code changes)
+
+File Name	Method Name	Remarks
+GetInterest.java	public static BusinessResponse xmlInterestAmountRetrieval(BusinessRequest brEntry)	This class, present in IvisionEJB ear, will communicate with the web services for interest computation, using REST web services.
+Calculate.java	public static CalculationMethodStrategy getInterestStrategy(String key)	This method will return the strategy based on the transaction scenario.
+CalculationMethodStrategy.java	public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)	Interface for computation strategy
+Calculation360MethodStrategy.java	public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)	Implements CalculationMethodStrategy. This method computes Interest for 360 Method
+Calculation365MethodStrategy.java	public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)	Implements CalculationMethodStrategy. This method computes Interest for 365 Method
+CalculationEnglishInclusiveMethodStrategy.java	public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)	Implements CalculationMethodStrategy. This method computes Interest for English Inclusive Method
+CalculationGermanInclusiveMethodStrategy.java	public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)	Implements CalculationMethodStrategy. This method computes Interest for German Inclusive Method
+CalculationGermanMethodStrategy.java	public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)	Implements CalculationMethodStrategy. This method computes Interest for German Method
+CalculationInternationalInclusiveMethodStrategy.java	public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)	Implements CalculationMethodStrategy. This method computes Interest for International Inclusive Method
+ComputeInterest.java	public static BigDecimal getInterestAmount(BigDecimal osAmount, int tenor, int daysInAYear, Float intRate )	Computes Interest Amount
+InterestUtils.java	public static boolean isLeapYear(Date date)	Checks if a year is leap or not
+InterestUtils.java	public static Date getEndOfYear(Date date)	Returns End of the year date
+InterestUtils.java	public static Date getStartOfYear(Date date) {	Returns Start of the year date
+InterestUtils.java	public static int getMonths(Date startDate, Date endDate)	Returns the number of months between the start and end date
+InterestConstant.java	-	Defines static constants
+ProrationReader.java	public void setSql(String sql)	Implements JdbcCursorItemReader and checks if proration can be executed  based on the output of sql query specified sql property of prorationReader specification on proration-job.xml.
+ProrationInterestTnxRecord.java		Wrapper used to hold the list of headers and ro generated by the ProrationProcessor.java and passed to the ProrationWriter.java
+ProrationProcessor.java	public ProrationInterestTnxRecord process(InterestTransaction interestTransaction)	Implements ItemProcessor, starting point of prorationProcessor.java.
+
+ProrationProcessor.java	private List<RecordOperation> buildNewRows()	This method generates the ros.
+ProrationProcessor.java	private RecordOperationHdr generateOprHdr(RecordOperation roOccur)	This method generates the header for each ro(occur1) generated.
+ProrationWriter.java	public void write(List<? extends ProrationInterestTnxRecord> recordOperationsList)	Implements ItemWriter.
+The method writes the list of generated headers and ros from the proration processor.
+PerintsettReader.java	public void setSql(String sql)	Implements JdbcCursorItemReader and checks if perintsett can be executed  based on the output of sql query specified sql property of perintsettReader specification on perintsett-job.xml.
+PerintsettInterestTnxRecord.java		Wrapper used to hold the list of results which will be persisted to db by perintsett process.
+PerintsettProcessor.java	public PerintsettInterestTnxRecord process(PerintsettInterestTnxRecord intRecord)	Implements ItemProcessor, and starting point of Perintsett Processor.
+PerintsettProcessor.java	private void buildNewRows(PerintsettInterestTnxRecord tnxRecord,Map<String, Object> productInformation, InterestTransaction interestTransaction)	This method builds the ro for perintsett execution.
+PerintsettWriter.java	public void write(List<? extends PerintsettInterestTnxRecord> interestRecords)	Implements ItemWriter.
+The method writes the header, ro, accounting entries, statements generated , interest  rows generated by the perintsett processor.
+BatchDaoUtils.java	public InterestAmountVO getTransactionInterestAmount(InterestTransaction intTxn,Date endDate, List<InterestStatement> oldList, Date curDate, Date batchRunningDate)	Calculates and returns the interest details for a particular transaction.
+BatchDaoUtils.java	public  ProductInfoRecord getProductInfo(String refId, String tnxId,String brchCode, String prodCode)	Get product information for particular reference id
+
+ 
+
+3.	System Setup
+
+3.1	Parameter Set Up
+
+Following parameters are involved in the interest computation / data defaulting:
+	System Features>Interest Rates 
+–	Base Rate Maintenance: defines the base rate values for a given base rate code, currency code and cut off tenor.
+–	Margin Maintenance: defines the base rate code and margin (to be added to the base rate value) for a given customer, product (eventually product group code), interest category, interest code, interest rate type code (Fixed, Floating …), cut of tenor, cut of amount, currency code and value date.
+	P012 – Interest Category defaults: a few minor default set-up per interest category, very rarely modified (such as follow calendar month or debit/credit flag).
+	P033 – Interest Code defaults: per product code (optional), eventually customer (optional), interest category and interest code, it defines the default values to be proposed in the interest screen, such as the interest rate type (Fixed, Floating …), interest payment code.
+	P050 – Interest settlement and accrual defaults: per product code (optional - and eventually product group code), gives a few minor additional parameters for the interest computation (whether or not to include holidays, the run date …).
+	P056 – Valid Interest Payment Method Codes: for a given product code (optional - and eventually product group code), indicates the periodicity of interest payments. This periodicity will be displayed in accordance of the rules defined in this parameter, upon the input stage of the transaction.
+	P102 – Interest account: indicates the P&L accounts to be credited with the amount of interests, charges and commissions collected, and their associated accruals or amortization suspense accounts.
+	P116  – Cost of funds defaults: Indicates the defaulted values for cost of funds (COF) processing, i.e. base rate used to calculate interests margin.
+	P139 – Accrual Interest (Data_16): No proration / Daily proration / Monthly proration
+	P140 – Monthly Interest Asia (Data_1)
+	P008– Country spread for interest (Data_5)
+	P105– Penalty spread rate (Data_1)
+	P191 - Switch NEW Interest Module Flag(Data_18)	
+	C011– The name of different computation method
+	C069–  Interest Category Code
+	C004–  Interest Code
+3.1.1	Additional information
+	Defaulting of the various interest dates from the transaction data: start date, end date, pay up to date, rate value date. See the interest fields’ definition.
+	Defaulting of the preferred interest calculation method depending on the product code and interest period: interest calculation method, interest type and interest payment (see P056 and P033).
+	Eventually defaulting of the customer periodic settlement account when the interest is to be automatically periodically settled (account retrieved from P004 – Customer defaults).
+
+3.2	Return Codes
+
+These are the Return codes, along with the description. These will be common for both the Model Layer and the Batches
+
+Error Code	Error Description
+1	Dir/parameter not found/Any java related error
+2	Time out
+3	file not found/can not remove/can not create temp file/already exists
+4	Oracle file write issue
+5	Another instance in progres
+6	Oracle plsql procedure syntax errors
+7	Error setting the date
+8	copying/movin source file
+9	Error during Purging
+10	Error while Parsing input/with input file
+11	Error while loading data/Moving records/updating - oracle related
+12	Error extracting swift msg/concatinating
+
+
+
+
+
+
+
+
+
+
+3.3	Table Created/Updated
+
+3.3.1	Table Created
+
+A new table DBT_C_INT_STATEMENT has been created to store the interest statements generated after Validation. The structure of the table is as below:
+
+Sr No	Column Name	Type
+1	BRCH_CODE                       	VARCHAR2(5)                                                                                                                                                                                   
+2	REF_ID                                 	VARCHAR2(10)                                                                                                                                                                                  
+3	TNX_ID                              	VARCHAR2(14)                                                                                                                                                                                  
+4	START_DATE                                                                                                                                                                                                                        	DATE
+5	END_DATE                                                                                                                                                                                                                          	DATE
+6	TNX_VAL_DATE                                                                                                                                                                                                                   	DATE   
+7	INT_RATE                                	NUMBER(12,8)                                                                                                                                                                                  
+8	INT_RATE_TYPE                           	VARCHAR2(2)                                                                                                                                                                                   
+9	INT_AMT                                 	NUMBER(17,3)                                                                                                                                                                                  
+10	OS_AMT                                  	NUMBER(17,3)                                                                                                                                                                                  
+11	IS_USABLE                               	VARCHAR2(1)                                                                                                                                                                                   
+12	IS_REVERSE                              	VARCHAR2(1)                                                                                                                                                                                   
+13	IS_SETTLED                              	VARCHAR2(1)                                                                                                                                                                                   
+14	STMT_ID	NUMBER(38,0)
+15	INT_CODE	VARCHAR2(2)                                                                                                                                                                                   
+16	INT_CAT_CODE	VARCHAR2(2)                                                                                                                                                                               
+17	MDFY_RATE_FLAG	VARCHAR2(1)                                                                                                                                                                               
+18	PARTIALLY_SETTLED	VARCHAR2(1)                                                                                                                                                                               
+19	INT_PYMT_METH_CODE	VARCHAR2(2)                                                                                                                                                                               
+20	MDFY_AMT_FLAG	VARCHAR2(1)                                                                                                                                                                               
+21	PRE_SETTLED	VARCHAR2(1)                                                                                                                                                                               
+22	BASE_RATE_CODE	VARCHAR2(2)                                                                                                                                                                               
+23	MONTHLY_SETTLED	VARCHAR2(1)                                                                                                                                                                               
+
+
+
+3.3.2	Tables Updated
+
+3 new columns have been added to both the tables DBT_C_INTEREST and DBT_C_INT_TNX.
+
+Sr No	New Column Added	Type
+1	DEFN_EXCH_RATE	VARCHAR2(1)                                                                                                                                                                                   
+2	CLIENT_EXCH_RATE                       	NUMBER(16,8)                                                                                                                                                                                  
+3	EXCH_RATE_INV_FLAG                	VARCHAR2(1)                                                                                                                                                                                  
+
+
+4.	Technical Specifications
+4.1	Modification in View Layer 
+No Changes in View Layer
+
+4.2	Modification in Controller Layer
+No Changes in Control Layer
+		
+4.3	Modification in Model Layer
+
+Following classes and their methods will be used for Interest Module
+
+1.	Calculate.java :  public static CalculationMethodStrategy getInterestStrategy(String key) 
+
+•	Input Parameters : key
+•	Return Value: CalculationMethodStrategy 
+•	Exception: None.
+•	This method will return the strategy based on the transaction scenario.
+
+ 
+
+
+2.	CalculationMethodStrategy.java : public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)
+
+•	Input Parameters : startDate, endDate,intRate, osAmount
+•	Return Value : BigDecimal
+•	Exception : None
+•	This class is an interface.
+
+ 
+
+3.	Calculation360MethodStrategy.java : public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)
+
+•	Input Parameters : startDate, endDate,intRate, osAmount obj
+•	Return Value : BigDecimal
+•	Exception : None
+•	This class is an implementation of CalculationMethodStrategy. 
+•	In this Method Start date is included but end date is not and some assumption are taken
+o	 every year has 360 days
+o	 Every Month Has real no of days
+ 
+
+4.	Calculation365MethodStrategy.java : public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)
+
+•	Input Parameters : startDate, endDate,intRate, osAmount obj
+•	Return Value : BigDecimal
+•	Exception : None
+•	This class is an implementation of CalculationMethodStrategy. 
+•	In this Method Start date is included but end date is not and some assumption are taken
+o	 every year has real number of days either 366 or 365 days
+o	 Every Month Has real no of days
+ 	
+
+5.	CalculationEnglishInclusiveMethodStrategy.java : public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)
+
+•	Input Parameters : startDate, endDate,intRate, osAmount obj
+•	Return Value : BigDecimal
+•	Exception : None
+•	This class is an implementation of CalculationMethodStrategy. 
+•	In this Method Start date and end date both are included and some assumption are taken
+o	 every year has real number of days either 366 or 365 days
+o	 Every Month Has real no of days
+
+ 
+
+6.	CalculationGermanInclusiveMethodStrategy.java : public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)
+
+•	Input Parameters : startDate, endDate,intRate, osAmount obj
+•	Return Value : BigDecimal
+•	Exception : None
+•	This class is an implementation of CalculationMethodStrategy. 
+•	In this Method Start date and end date both are included and some assumption are taken
+o	 every year has 360 days
+o	 Every Month Has 30 days
+ 
+
+7.	CalculationGermanMethodStrategy.java : public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)
+
+•	Input Parameters : startDate, endDate,intRate, osAmount obj
+•	Return Value : BigDecimal
+•	Exception : None
+•	This class is an implementation of CalculationMethodStrategy. 
+•	In this Method Start date and end date both are included and some assumption are taken
+o	 every year has 360 days
+o	 Every Month Has 30 days
+
+ 
+
+
+
+8.	CalculationInternationalInclusiveMethodStrategy.java : public BigDecimal calculateInterest(Date startDate, Date endDate, Float intRate, BigDecimal osAmount)
+
+•	Input Parameters : startDate, endDate,intRate, osAmount obj
+•	Return Value : BigDecimal
+•	Exception : None
+•	This class is an implementation of CalculationMethodStrategy. 
+•	In this Method Start date and end date both are included and some assumption are taken
+o	 every year has 360 days
+o	 Every Month Has real number of days
+ 
+
+
+9.	ComputeInterest.java  : public static BigDecimal getInterestAmount(BigDecimal osAmount, int tenor, int daysInAYear, Float intRate )
+
+•	Input Parameters :  osAmount, tenor, daysInAYear, intRate
+•	Return Value : BigDecimal
+•	Exception : None
+•	This method Computes Interest Amount. 
+
+ 
+
+10.	InterestUtils.java  : public static boolean isLeapYear(Date date)
+
+•	Input Parameters : date
+•	Return Value : boolean
+•	Exception : None
+•	This method Checks if a year is leap or not.
+
+ 
+
+11.	InterestUtils.java  : public static Date getEndOfYear(Date date)
+
+•	Input Parameters : date
+•	Return Value : Date
+•	Exception : None
+•	This method Returns End of the year date.
+
+12.	InterestUtils.java  : public static Date getStartOfYear (Date date)
+
+•	Input Parameters : date
+•	Return Value : Date
+•	Exception : None
+•	This method Returns Start of the year date.
+
+13.	InterestUtils.java  : public static int getMonths(Date startDate, Date endDate)
+•	Input Parameters : startDate, endDate
+•	Return Value : int
+•	Exception : None
+•	Returns the number of months between the start and end date
+
+
+
+14.	ComputationInvoker.java
+This class is used to invoke the calculate() method.
+ 
+
+
+
+
+
+
+
+15.	InterestServiceController.java
+ 
+
+16.	TimestampAdapter.java
+
+ 
+17.	TimestampConverter.java
+ 
+
+18.	Interest.java
+This is a POJO class of Interest object.
+
+19.	InterestImage.java
+This is a POJO class of the Interest image.
+
+20.	InterestStrategyFactory.java
+ 
+21.	BusinessCodesResourceProvider.java
+File to define the static constants
+
+22.	InterestService.java
+ 
+
+23.	ExtendInterestStrategy.java
+ 
+24.	NormalInterestStrategy.java
+ 
+
+25.	IvisionClient.java
+ 
+
+
+
+
+
+26.	DefaultConfig.java
+ 
+
+
+27.	DefaultClient.java
+ 
+28.	CommonUtils.java
+ 
+29.	IvisionInterestConstants.java
+ 
+30.	IvisionInterest.properties
+Configuration file to store the URL and port number where the Web services is deployed.
+
+31.	InterestPhases.java
+Extended by classes for Phases for New, Update, Extend, Partial Settle, Settle and Product Transfer
+
+
+ 
+
+32.	InterestPhaseNew.java
+33.	InterestPhaseUpdate.java
+34.	InterestPhaseExtend.java
+35.	InterestPhasePartialSettle.java
+36.	InterestPhaseSettle.java
+37.	InterestPhaseProdTransfer.java
+38.	InsertStmtGenerator.java
+Extended by classes for Normal, Overdue, Extend Interest Statements.
+39.	NormalInsertStmtGenerator.java
+40.	ExtendInsertStmtGenerator.java
+41.	OverdueInsertStmtGenerator.java
+
+
+
+ 
+
+42.	UpdateStmtGenerator.java
+Class used to get the to_be_updated tuples.
+
+ 
+
+43.	TransactionStatementGenerator.java
+Class used to generate the Interest statements to be displayed on the screen.
+ 
+4.4	Modification in Batches
+
+
+Following classes and their methods will be used for Batches
+
+1.	ProrationReader.java: public void setSql(String sql)
+•	Input Parameters : String 
+•	Return Value : None
+•	Exception : None
+•	This class is an implementation of JdbcCursorItemReader. 
+•	Implements the reader which checks if the proration run is applicable based on the sql query execution result.
+
+2.	ProrationProcessor.java:public ProrationInterestTnxRecord process(InterestTransaction interestTransaction)
+•	Input Parameters : InterestTransaction 
+•	Return Value : ProrationInterestTnxRecord
+•	Exception : None
+•	This class is an implementation of ItemProcessor. 
+•	Generates and returns the header and ro generated by Proration. 
+	
+3.	ProrationWriter.java:public void write(List<? extends ProrationInterestTnxRecord> recordOperationsList)
+•	Input Parameters : List of ProrationInterestTnxRecord 
+•	Return Value : None
+•	Exception : None
+•	This class is an implementation of ItemWriter. 
+•	Writes the generated header and ro in the database.
+
+
+4.	PerintsettReader.java:public void setSql(String sql)
+•	Input Parameters : String 
+•	Return Value : None
+•	Exception : None
+•	This class is an implementation of JdbcCursorItemReader. 
+•	Implements the reader which checks if the perintsett run is applicable based on the sql query execution result.
+
+5.	PerintsettProcessor.java:public PerintsettInterestTnxRecord process(PerintsettInterestTnxRecord intRecord)
+
+•	Input Parameters : PerintsettInterestTnxRecord
+•	Return Value : PerintsettInterestTnxRecord
+•	Exception : None
+•	This class is an implementation of ItemProcessor. 
+•	Perintsett batch execution starts from this method and eventually generates ro, headers , accounting entries, statements.
+
+6.	PerintsettWriter.java: public void write(List<? extends PerintsettInterestTnxRecord> interestRecords)
+•	Input Parameters :List of PerintsettInterestTnxRecord
+•	Return Value : None
+•	Exception : None
+•	This class is an implementation of ItemWriter. 
+•	Writes the output generated by the perintsett process in database.
+
+7.	BatchDaoUtils.java: public InterestAmountVO getTransactionInterestAmount(InterestTransaction intTxn,Date endDate, List<InterestStatement> oldList, Date curDate, Date batchRunningDate)
+•	Input Parameters : InterestTransaction,EndDate,CurrentDate,batchRunningDate,OldStatementList
+•	Return Value : InterestAmountVo
+•	Exception : None
+•	This class is utility class.
+•	Generate interest details for a particular transaction.
+
+8.	BatchDaoUtils.java: public  ProductInfoRecord getProductInfo(String refId, String tnxId,String brchCode, String prodCode)
+•	Input Parameters : referenceID,tnxID,branchCode,ProductCode
+•	Return Value : ProductInfoRecord
+•	Exception : None
+•	This class is utility class.
+•	Get product information for particular reference id.
+
+
+
+
+5.	Comments
+ 
+
